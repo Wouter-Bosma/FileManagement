@@ -22,7 +22,7 @@ namespace BackupSolution
         private Configuration config = new();
         private async void button1_Click(object sender, EventArgs e)
         {
-            button1.Enabled = false;
+            ReadFolderContents.Enabled = false;
             try
             {
                 foreach (var folder in config.Folders.Where(x => !root.TryGetFolderData(x, out _)))
@@ -31,13 +31,11 @@ namespace BackupSolution
                 }
 
                 config.Save(root);
-                //string jsonString = JsonSerializer.Serialize(root);
-                //await File.WriteAllTextAsync(@"M:\W.json", jsonString);
                 DrawTree();
             }
             finally
             {
-                button1.Enabled = true;
+                ReadFolderContents.Enabled = true;
             }
         }
         private async void button2_Click(object sender, EventArgs e)

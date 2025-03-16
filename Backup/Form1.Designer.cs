@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
+            ReadFolderContents = new Button();
             button2 = new Button();
             directoryTreeView = new TreeView();
             textBox1 = new TextBox();
@@ -46,15 +46,15 @@
             tabPage2.SuspendLayout();
             SuspendLayout();
             // 
-            // button1
+            // ReadFolderContents
             // 
-            button1.Location = new Point(6, 6);
-            button1.Name = "button1";
-            button1.Size = new Size(157, 23);
-            button1.TabIndex = 0;
-            button1.Text = "Read folder contents";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            ReadFolderContents.Location = new Point(6, 6);
+            ReadFolderContents.Name = "ReadFolderContents";
+            ReadFolderContents.Size = new Size(157, 23);
+            ReadFolderContents.TabIndex = 0;
+            ReadFolderContents.Text = "Read folder contents";
+            ReadFolderContents.UseVisualStyleBackColor = true;
+            ReadFolderContents.Click += button1_Click;
             // 
             // button2
             // 
@@ -139,7 +139,7 @@
             // tabPage1
             // 
             tabPage1.Controls.Add(directoryTreeView);
-            tabPage1.Controls.Add(button1);
+            tabPage1.Controls.Add(ReadFolderContents);
             tabPage1.Controls.Add(textBox1);
             tabPage1.Controls.Add(textBox2);
             tabPage1.Controls.Add(textBox3);
@@ -195,7 +195,7 @@
 
         #endregion
 
-        private Button button1;
+        private Button ReadFolderContents;
         private Button button2;
         private TreeView directoryTreeView;
         private TextBox textBox1;
