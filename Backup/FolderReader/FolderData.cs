@@ -103,6 +103,7 @@ namespace BackupSolution.FolderReader
         {
             foreach (var file in Files.OrderBy(x => x.FileName))
             {
+                file.FolderData = this;
                 yield return file;
             }
 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             ReadFolderContents = new Button();
             button2 = new Button();
             directoryTreeView = new TreeView();
@@ -40,10 +41,14 @@
             mainViewTabControl = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
+            duplicateTreeView = new TreeView();
+            duplicateContextMenuStrip = new ContextMenuStrip(components);
+            calculateMD5ToolStripMenuItem = new ToolStripMenuItem();
             findDuplicateButton = new Button();
             mainViewTabControl.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            duplicateContextMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // ReadFolderContents
@@ -128,6 +133,7 @@
             // 
             // mainViewTabControl
             // 
+            mainViewTabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             mainViewTabControl.Controls.Add(tabPage1);
             mainViewTabControl.Controls.Add(tabPage2);
             mainViewTabControl.Location = new Point(175, 41);
@@ -153,6 +159,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(duplicateTreeView);
             tabPage2.Controls.Add(findDuplicateButton);
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
@@ -161,6 +168,31 @@
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Duplicate List";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // duplicateTreeView
+            // 
+            duplicateTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            duplicateTreeView.ContextMenuStrip = duplicateContextMenuStrip;
+            duplicateTreeView.Location = new Point(6, 35);
+            duplicateTreeView.Name = "duplicateTreeView";
+            duplicateTreeView.Size = new Size(532, 372);
+            duplicateTreeView.TabIndex = 11;
+            duplicateTreeView.NodeMouseClick += duplicateTreeView_NodeMouseClick;
+            duplicateTreeView.NodeMouseDoubleClick += duplicateTreeView_NodeMouseDoubleClick;
+            // 
+            // duplicateContextMenuStrip
+            // 
+            duplicateContextMenuStrip.Items.AddRange(new ToolStripItem[] { calculateMD5ToolStripMenuItem });
+            duplicateContextMenuStrip.Name = "duplicateContextMenuStrip";
+            duplicateContextMenuStrip.Size = new Size(182, 26);
+            duplicateContextMenuStrip.Click += duplicateContextMenuStrip_Click;
+            // 
+            // calculateMD5ToolStripMenuItem
+            // 
+            calculateMD5ToolStripMenuItem.Name = "calculateMD5ToolStripMenuItem";
+            calculateMD5ToolStripMenuItem.Size = new Size(181, 22);
+            calculateMD5ToolStripMenuItem.Text = "Calculate MD5 Hash";
+            calculateMD5ToolStripMenuItem.Click += calculateMD5ToolStripMenuItem_Click;
             // 
             // findDuplicateButton
             // 
@@ -189,6 +221,7 @@
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
+            duplicateContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -208,5 +241,8 @@
         private TabPage tabPage1;
         private TabPage tabPage2;
         private Button findDuplicateButton;
+        private TreeView duplicateTreeView;
+        private ContextMenuStrip duplicateContextMenuStrip;
+        private ToolStripMenuItem calculateMD5ToolStripMenuItem;
     }
 }

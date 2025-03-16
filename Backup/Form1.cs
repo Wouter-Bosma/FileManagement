@@ -1,7 +1,10 @@
 using BackupSolution.FolderReader;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
 //using Microsoft.Data.Sqlite;
@@ -161,7 +164,125 @@ namespace BackupSolution
 
         private void findDuplicateButton_Click(object sender, EventArgs e)
         {
+            duplicateTreeView.Nodes.Clear();
+            var result = new Dictionary<long, List<FileData>>();
+            foreach (var fd in root.EnumerateOverAllFiles())
+            {
+                if (result.TryGetValue(fd.FileSize, out var items))
+                {
+                    items.Add(fd);
+                }
+                else
+                {
+                    result[fd.FileSize] = [fd];
+                }
+            }
 
+            var filtered = result.Where(x => x.Value.Count() > 1).ToDictionary(x => x.Key, y => y.Value);
+            var rootNode = new TreeNode("Root");
+            foreach (var kvp in filtered.OrderBy(x => -x.Key * x.Value.Count))
+            {
+                var node = new TreeNode(kvp.Key.ToString());
+                foreach (var item in kvp.Value)
+                {
+                    node.Nodes.Add(new TreeNode(item.FullPathWithMd5) { Tag = item });
+                }
+
+                rootNode.Nodes.Add(node);
+            }
+            duplicateTreeView.Nodes.AddRange(rootNode);
+        }
+
+        private async void duplicateTreeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Node == null)
+            {
+                return;
+            }
+            if (e.Node.Tag == null)
+            {
+                duplicateTreeView.Enabled = false;
+                foreach (var child in e.Node.Nodes)
+                {
+                    if (child is not TreeNode childNode || childNode.Tag is not FileData fileData)
+                    {
+                        continue;
+                    }
+
+                    if (await fileData.CalculateMd5Hash())
+                    {
+                        childNode.Text = $@"{fileData.FullPathWithMd5}";
+                    }
+                }
+                duplicateTreeView.Enabled = true;
+            }
+        }
+
+        private void duplicateContextMenuStrip_Click(object sender, EventArgs e)
+        {
+            //var cms = (ContextMenuStrip)sender;
+            //cms.
+        }
+
+        private TreeNode? selectedNode = null;
+
+        private async void calculateMD5ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await ProcessClickToCalculateHash(selectedNode);
+        }
+
+        private async Task ProcessClickToCalculateHash(TreeNode? nodeToProcess)
+        {
+            if (nodeToProcess == null || nodeToProcess.Nodes.Count == 0)
+            {
+                return;
+            }
+            if (nodeToProcess.Nodes[0].Tag is FileData fd)
+            {
+                await CalculateHashes(nodeToProcess);
+            }
+
+            if (nodeToProcess.Text == "Root")
+            {
+                var tasks = new List<Task>();
+                foreach (var node in nodeToProcess.Nodes)
+                {
+                    tasks.Add(ProcessClickToCalculateHash((TreeNode)node));
+                    if (tasks.Count >= 4)
+                    {
+                        var task = await Task.WhenAny(tasks);
+                        tasks.Remove(task);
+                    }
+                }
+
+                await Task.WhenAll(tasks);
+            }
+        }
+
+        private async Task CalculateHashes(TreeNode nodeToCalculate)
+        {
+            nodeToCalculate.BackColor = Color.Yellow;
+            for (int i = 0; i < nodeToCalculate.Nodes.Count; ++i)
+            {
+                var treeNode = nodeToCalculate.Nodes[i];
+                if (treeNode.Tag is not FileData data)
+                {
+                    continue;
+                }
+                if (await data.CalculateMd5Hash())
+                {
+                    treeNode.Text = data.FullPathWithMd5;
+                }
+
+                treeNode.ForeColor = Color.DarkBlue;
+            }
+
+            nodeToCalculate.BackColor = Color.BlanchedAlmond;
+        }
+
+        private void duplicateTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            selectedNode = e.Node;
         }
     }
 }
