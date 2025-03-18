@@ -45,6 +45,7 @@
             duplicateContextMenuStrip = new ContextMenuStrip(components);
             calculateMD5ToolStripMenuItem = new ToolStripMenuItem();
             findDuplicateButton = new Button();
+            md5ProgressBar = new ProgressBar();
             mainViewTabControl.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -159,6 +160,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(md5ProgressBar);
             tabPage2.Controls.Add(duplicateTreeView);
             tabPage2.Controls.Add(findDuplicateButton);
             tabPage2.Location = new Point(4, 24);
@@ -204,6 +206,13 @@
             findDuplicateButton.UseVisualStyleBackColor = true;
             findDuplicateButton.Click += findDuplicateButton_Click;
             // 
+            // md5ProgressBar
+            // 
+            md5ProgressBar.Location = new Point(6, 413);
+            md5ProgressBar.Name = "md5ProgressBar";
+            md5ProgressBar.Size = new Size(151, 23);
+            md5ProgressBar.TabIndex = 12;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -244,5 +253,6 @@
         private TreeView duplicateTreeView;
         private ContextMenuStrip duplicateContextMenuStrip;
         private ToolStripMenuItem calculateMD5ToolStripMenuItem;
+        private ProgressBar md5ProgressBar;
     }
 }

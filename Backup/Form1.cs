@@ -178,9 +178,9 @@ namespace BackupSolution
                 }
             }
 
-            var filtered = result.Where(x => x.Value.Count() > 1).ToDictionary(x => x.Key, y => y.Value);
+            filtered = result.Where(x => x.Value.Count() > 1).ToDictionary(x => x.Key, y => y.Value);
             var rootNode = new TreeNode("Root");
-            foreach (var kvp in filtered.OrderBy(x => -x.Key * x.Value.Count))
+            foreach (var kvp in filtered.OrderBy(x => -x.Key * (x.Value.Count-1)))
             {
                 var node = new TreeNode(kvp.Key.ToString());
                 foreach (var item in kvp.Value)
@@ -193,6 +193,7 @@ namespace BackupSolution
             duplicateTreeView.Nodes.AddRange(rootNode);
         }
 
+        private Dictionary<long, List<FileData>> filtered = null;
         private async void duplicateTreeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node == null)
@@ -226,12 +227,23 @@ namespace BackupSolution
 
         private TreeNode? selectedNode = null;
 
+        private CancellationTokenSource? cts = null;
+
         private async void calculateMD5ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            await ProcessClickToCalculateHash(selectedNode);
+            if (cts == null)
+            {
+                cts = new CancellationTokenSource();
+                await ProcessClickToCalculateHash(selectedNode, cts.Token);
+            }
+            else
+            {
+                await cts?.CancelAsync()!;
+                cts = null;
+            }
         }
 
-        private async Task ProcessClickToCalculateHash(TreeNode? nodeToProcess)
+        private async Task ProcessClickToCalculateHash(TreeNode? nodeToProcess, CancellationToken ct)
         {
             if (nodeToProcess == null || nodeToProcess.Nodes.Count == 0)
             {
@@ -239,28 +251,35 @@ namespace BackupSolution
             }
             if (nodeToProcess.Nodes[0].Tag is FileData fd)
             {
-                await CalculateHashes(nodeToProcess);
+                //md5ProgressBar.Value = 0;
+                await CalculateHashes(nodeToProcess, ct);
+                //md5ProgressBar.Value = 100;
+                //cts = null;//TODO: fix: Thread unsafe
             }
 
+            
             if (nodeToProcess.Text == "Root")
             {
-                var tasks = new List<Task>();
+                var total = filtered.Sum(x => x.Key * x.Value.Count);
+                var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash))); 
                 foreach (var node in nodeToProcess.Nodes)
                 {
-                    tasks.Add(ProcessClickToCalculateHash((TreeNode)node));
-                    if (tasks.Count >= 4)
+                    await ProcessClickToCalculateHash((TreeNode)node, ct);
+                    if (ct.IsCancellationRequested)
                     {
-                        var task = await Task.WhenAny(tasks);
-                        tasks.Remove(task);
+                        break;
                     }
+                    //var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash)));
+                    //md5ProgressBar.Value = (int)(100 * calculated / total);
                 }
 
-                await Task.WhenAll(tasks);
+                cts = null; //TODO: fix: Thread unsafe
             }
         }
 
-        private async Task CalculateHashes(TreeNode nodeToCalculate)
+        private async Task CalculateHashes(TreeNode nodeToCalculate, CancellationToken ct)
         {
+            
             nodeToCalculate.BackColor = Color.Yellow;
             for (int i = 0; i < nodeToCalculate.Nodes.Count; ++i)
             {
@@ -275,6 +294,10 @@ namespace BackupSolution
                 }
 
                 treeNode.ForeColor = Color.DarkBlue;
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
             }
 
             nodeToCalculate.BackColor = Color.BlanchedAlmond;
