@@ -15,13 +15,14 @@ namespace BackupSolution.FolderReader
     {
         private Dictionary<string, FolderData> _folders;
         private Dictionary<FolderData, MemoData> _memo;
+        private FolderData _parent = null;
         private static readonly Lock _lockingObject = new();
         public void Reset()
         {
             _memo.Clear();
         }
 
-        public FolderData GetOrCreateFolderData(string root, string path)
+        public FolderData GetOrCreateFolderData(string root, string path, FolderData parent)
         {
             var combinedPath = Path.Combine(root, path);
             lock (_lockingObject)
@@ -31,8 +32,10 @@ namespace BackupSolution.FolderReader
                     return fd;
                 }
 
-                var folder = new FolderData(root, path, _folders, _memo);
-                
+                var folder = new FolderData(root, path, _folders, _memo)
+                {
+                    _parent = parent,
+                };
                 return folder;
             }
         }
@@ -60,6 +63,8 @@ namespace BackupSolution.FolderReader
 
         }
 
+        public FolderData(string root, string relativePath) : this(root, relativePath, new(), new()) { }
+
         public void Init()
         {
             _folders = new Dictionary<string, FolderData>();
@@ -68,10 +73,11 @@ namespace BackupSolution.FolderReader
             RecursiveInit();
         }
 
-        private void Init(Dictionary<string, FolderData> folders, Dictionary<FolderData, MemoData> memo)
+        private void Init(FolderData parent, Dictionary<string, FolderData> folders, Dictionary<FolderData, MemoData> memo)
         {
             _folders = folders;
             _memo = memo;
+            _parent = parent;
             _folders.Add(Path.Combine(Root, RelativePath), this);
             RecursiveInit();
         }
@@ -80,11 +86,9 @@ namespace BackupSolution.FolderReader
         {
             foreach (var fd in Folders)
             {
-                fd.Init(_folders, _memo);
+                fd.Init(this, _folders, _memo);
             }
         }
-
-        public FolderData (string root, string relativePath) : this(root, relativePath, new(), new()) { }
 
         [JsonIgnore]
         public string FolderName => Path.Combine(Root, RelativePath);

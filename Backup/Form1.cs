@@ -261,17 +261,26 @@ namespace BackupSolution
             if (nodeToProcess.Text == "Root")
             {
                 var total = filtered.Sum(x => x.Key * x.Value.Count);
-                var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash))); 
+                var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash)));
+                var tasks = new List<Task>();
                 foreach (var node in nodeToProcess.Nodes)
                 {
-                    await ProcessClickToCalculateHash((TreeNode)node, ct);
+                    tasks.Add(ProcessClickToCalculateHash((TreeNode)node, ct));
                     if (ct.IsCancellationRequested)
                     {
                         break;
                     }
+
+                    if (tasks.Count > 2)
+                    {
+                        var completed = await Task.WhenAny(tasks);
+                        tasks.Remove(completed);
+                    }
                     //var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash)));
                     //md5ProgressBar.Value = (int)(100 * calculated / total);
                 }
+
+                await Task.WhenAll(tasks);
 
                 cts = null; //TODO: fix: Thread unsafe
             }

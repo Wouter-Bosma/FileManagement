@@ -41,11 +41,13 @@
             mainViewTabControl = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
+            md5ProgressBar = new ProgressBar();
             duplicateTreeView = new TreeView();
             duplicateContextMenuStrip = new ContextMenuStrip(components);
             calculateMD5ToolStripMenuItem = new ToolStripMenuItem();
             findDuplicateButton = new Button();
-            md5ProgressBar = new ProgressBar();
+            tabPage3 = new TabPage();
+            tabPage4 = new TabPage();
             mainViewTabControl.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -137,6 +139,8 @@
             mainViewTabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             mainViewTabControl.Controls.Add(tabPage1);
             mainViewTabControl.Controls.Add(tabPage2);
+            mainViewTabControl.Controls.Add(tabPage3);
+            mainViewTabControl.Controls.Add(tabPage4);
             mainViewTabControl.Location = new Point(175, 41);
             mainViewTabControl.Name = "mainViewTabControl";
             mainViewTabControl.SelectedIndex = 0;
@@ -170,6 +174,14 @@
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Duplicate List";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // md5ProgressBar
+            // 
+            md5ProgressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            md5ProgressBar.Location = new Point(6, 413);
+            md5ProgressBar.Name = "md5ProgressBar";
+            md5ProgressBar.Size = new Size(151, 23);
+            md5ProgressBar.TabIndex = 12;
             // 
             // duplicateTreeView
             // 
@@ -206,12 +218,23 @@
             findDuplicateButton.UseVisualStyleBackColor = true;
             findDuplicateButton.Click += findDuplicateButton_Click;
             // 
-            // md5ProgressBar
+            // tabPage3
             // 
-            md5ProgressBar.Location = new Point(6, 413);
-            md5ProgressBar.Name = "md5ProgressBar";
-            md5ProgressBar.Size = new Size(151, 23);
-            md5ProgressBar.TabIndex = 12;
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(544, 499);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Destination";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // tabPage4
+            // 
+            tabPage4.Location = new Point(4, 24);
+            tabPage4.Name = "tabPage4";
+            tabPage4.Size = new Size(544, 499);
+            tabPage4.TabIndex = 3;
+            tabPage4.Text = "Copier";
+            tabPage4.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -254,5 +277,7 @@
         private ContextMenuStrip duplicateContextMenuStrip;
         private ToolStripMenuItem calculateMD5ToolStripMenuItem;
         private ProgressBar md5ProgressBar;
+        private TabPage tabPage3;
+        private TabPage tabPage4;
     }
 }

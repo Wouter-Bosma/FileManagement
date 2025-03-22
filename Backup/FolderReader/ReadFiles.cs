@@ -9,12 +9,18 @@ namespace BackupSolution.FolderReader;
 internal class ReadFiles
 {
     private static Lock lockingObject = new Lock();
+
     public static async Task<FolderData> ReadFilesRecursive(string folderName, FolderData rootFolder)
+    {
+        return await ReadFilesRecursive(folderName, rootFolder, rootFolder);
+    }
+
+    public static async Task<FolderData> ReadFilesRecursive(string folderName, FolderData rootFolder, FolderData parent)
     {
         folderName = folderName.EndsWith('\\') ? folderName : folderName + "\\";
         var root = Path.GetPathRoot(folderName);
         var path = Path.GetRelativePath(root, folderName);
-        var result = rootFolder.GetOrCreateFolderData(root, path);
+        var result = rootFolder.GetOrCreateFolderData(root, path, parent);
         
         IEnumerable<string> folders;
         try
@@ -27,7 +33,7 @@ internal class ReadFiles
         }
         await Parallel.ForEachAsync(folders, new ParallelOptions(), async (folder, _) =>
         {
-            var item = await ReadFilesRecursive(folder, rootFolder);
+            var item = await ReadFilesRecursive(folder, rootFolder, result);
             lock (lockingObject)
             {
                 result.Folders.Add(item);
