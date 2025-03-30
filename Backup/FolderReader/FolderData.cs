@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using NLog;
+using System.IO;
 using System.Text.Json.Serialization;
 
 namespace BackupSolution.FolderReader
@@ -13,6 +14,7 @@ namespace BackupSolution.FolderReader
 
     public class FolderData
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
         private Dictionary<string, FolderData> _folders;
         private Dictionary<FolderData, MemoData> _memo;
         private FolderData _parent = null;
@@ -29,9 +31,11 @@ namespace BackupSolution.FolderReader
             {
                 if (_folders.TryGetValue(combinedPath, out var fd))
                 {
+                    _logger.Log(LogLevel.Info, $"_folders Found {combinedPath}");
                     return fd;
                 }
 
+                _logger.Log(LogLevel.Info, $"_folders not found {combinedPath}, return new folder with [{root}, {path}]");
                 var folder = new FolderData(root, path, _folders, _memo)
                 {
                     _parent = parent,
@@ -45,7 +49,9 @@ namespace BackupSolution.FolderReader
             folderName = folderName.EndsWith('\\') ? folderName : folderName + "\\";
             var root = Path.GetPathRoot(folderName);
             var path = Path.GetRelativePath(root, folderName);
-            return _folders.TryGetValue(Path.Combine(root, path), out fd);
+            var result = _folders.TryGetValue(Path.Combine(root, path), out fd);
+            _logger.Log(LogLevel.Info, $"TryGetFolderData[{folderName},{root},{path}] => {result}");
+            return result;
         }
 
         private FolderData(string root, string relativePath, Dictionary<string, FolderData> folders, Dictionary<FolderData, MemoData> memo)
@@ -55,6 +61,7 @@ namespace BackupSolution.FolderReader
             var combinedPath = Path.Combine(root, relativePath);
             Root = root;
             RelativePath = relativePath;
+            _logger.Log(LogLevel.Info, $"Add[{root},{relativePath},{combinedPath}]");
             _folders[combinedPath] = this;
         }
 
@@ -69,6 +76,7 @@ namespace BackupSolution.FolderReader
         {
             _folders = new Dictionary<string, FolderData>();
             _memo = new Dictionary<FolderData, MemoData>();
+            _logger.Log(LogLevel.Info, $"Init base[{Root},{RelativePath}]");
             _folders.Add(Path.Combine(Root, RelativePath), this);
             RecursiveInit();
         }
@@ -78,6 +86,7 @@ namespace BackupSolution.FolderReader
             _folders = folders;
             _memo = memo;
             _parent = parent;
+            _logger.Log(LogLevel.Info, $"Init[{Root},{RelativePath}]");
             _folders.Add(Path.Combine(Root, RelativePath), this);
             RecursiveInit();
         }
@@ -90,8 +99,15 @@ namespace BackupSolution.FolderReader
             }
         }
 
+        public string ManualFolderName { get; set; } = string.Empty;
+
         [JsonIgnore]
-        public string FolderName => Path.Combine(Root, RelativePath);
+        public string FolderName
+        {
+            get => string.IsNullOrEmpty(ManualFolderName) ? Path.Combine(Root, RelativePath) : ManualFolderName;
+            set => ManualFolderName = value;
+        }
+        
         public string Root { get; set; }
         public string RelativePath { get; set; }
 
