@@ -17,48 +17,56 @@ namespace BackupSolution
         public Form1()
         {
             InitializeComponent();
-            config.Load(ref root);
+            config.Load();
             DrawFolderList();
         }
 
-        private FolderData root = null;
         private Configuration config = new();
-        private async void button1_Click(object sender, EventArgs e)
+        private async void refreshFolderContentsButton_Click(object sender, EventArgs e)
         {
             ReadFolderContents.Enabled = false;
+            refreshDataCheckBox.Enabled = false;
+            var refreshData = refreshDataCheckBox.Checked;
             try
             {
-                foreach (var folder in config.Folders.Where(x => !root.TryGetFolderData(x, out _)))
+                //Add selected node
+                if (folderListBox?.SelectedItem is string item)
                 {
-                    root.Folders.Add(await ReadFiles.ReadFilesRecursive(folder, root));
+                    if (!config.Root.TryGetFolderData(item, out _))
+                    {
+                        config.Root.Folders.Add(await ReadFiles.ReadFilesRecursive(item, config.Root));
+                    }
+                    else
+                    {
+                        await ReadFiles.ReadFilesRecursive(item, config.Root);
+                    }
                 }
-
-                config.Save(root);
+                else
+                {
+                    //Add only unavailable nodes.
+                    foreach (var folder in config.Folders)
+                    {
+                        if (!config.Root.TryGetFolderData(folder, out _))
+                        {
+                            config.Root.Folders.Add(await ReadFiles.ReadFilesRecursive(folder, config.Root));
+                        }
+                        else if (refreshData)
+                        {
+                            await ReadFiles.ReadFilesRecursive(folder, config.Root);
+                        }
+                    }
+                }
+                config.Save();
                 DrawTree();
             }
             finally
             {
                 ReadFolderContents.Enabled = true;
+                refreshDataCheckBox.Enabled = true;
             }
         }
         private async void button2_Click(object sender, EventArgs e)
         {
-            button2.Enabled = false;
-            try
-            {
-                var readData = File.ReadAllTextAsync(@"M:\W.json");
-                await readData;
-                if (readData.IsCompletedSuccessfully)
-                {
-                    root = JsonSerializer.Deserialize<FolderData>(readData.Result);
-                    root?.Reset();
-                }
-                //await ImportDataFromDatabaseAsync();
-            }
-            finally
-            {
-                button2.Enabled = true;
-            }
             DrawTree();
         }
 
@@ -83,7 +91,7 @@ namespace BackupSolution
         {
             directoryTreeView.Nodes.Clear();
 
-            directoryTreeView.Nodes.Add(CreateTree(root));
+            directoryTreeView.Nodes.Add(CreateTree(config.Root));
 
         }
 
@@ -126,7 +134,7 @@ namespace BackupSolution
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            config.Save(root);
+            config.Save();
         }
 
         private void addFolderButton_Click(object sender, EventArgs e)
@@ -157,7 +165,7 @@ namespace BackupSolution
             {
                 return;
             }
-            //Remove data from root tree
+            //TODO: Remove data from root tree
             config.Folders.Remove(item);
             DrawFolderList();
         }
@@ -166,7 +174,7 @@ namespace BackupSolution
         {
             duplicateTreeView.Nodes.Clear();
             var result = new Dictionary<long, List<FileData>>();
-            foreach (var fd in root.EnumerateOverAllFiles())
+            foreach (var fd in config.Root.EnumerateOverAllFiles())
             {
                 if (result.TryGetValue(fd.FileSize, out var items))
                 {
@@ -178,9 +186,9 @@ namespace BackupSolution
                 }
             }
 
-            var filtered = result.Where(x => x.Value.Count() > 1).ToDictionary(x => x.Key, y => y.Value);
+            filtered = result.Where(x => x.Value.Count() > 1).ToDictionary(x => x.Key, y => y.Value);
             var rootNode = new TreeNode("Root");
-            foreach (var kvp in filtered.OrderBy(x => -x.Key * x.Value.Count))
+            foreach (var kvp in filtered.OrderBy(x => -x.Key * (x.Value.Count-1)))
             {
                 var node = new TreeNode(kvp.Key.ToString());
                 foreach (var item in kvp.Value)
@@ -193,6 +201,7 @@ namespace BackupSolution
             duplicateTreeView.Nodes.AddRange(rootNode);
         }
 
+        private Dictionary<long, List<FileData>> filtered = null;
         private async void duplicateTreeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node == null)
@@ -226,12 +235,23 @@ namespace BackupSolution
 
         private TreeNode? selectedNode = null;
 
+        private CancellationTokenSource? cts = null;
+
         private async void calculateMD5ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            await ProcessClickToCalculateHash(selectedNode);
+            if (cts == null)
+            {
+                cts = new CancellationTokenSource();
+                await ProcessClickToCalculateHash(selectedNode, cts.Token);
+            }
+            else
+            {
+                await cts?.CancelAsync()!;
+                cts = null;
+            }
         }
 
-        private async Task ProcessClickToCalculateHash(TreeNode? nodeToProcess)
+        private async Task ProcessClickToCalculateHash(TreeNode? nodeToProcess, CancellationToken ct)
         {
             if (nodeToProcess == null || nodeToProcess.Nodes.Count == 0)
             {
@@ -239,28 +259,44 @@ namespace BackupSolution
             }
             if (nodeToProcess.Nodes[0].Tag is FileData fd)
             {
-                await CalculateHashes(nodeToProcess);
+                //md5ProgressBar.Value = 0;
+                await CalculateHashes(nodeToProcess, ct);
+                //md5ProgressBar.Value = 100;
+                //cts = null;//TODO: fix: Thread unsafe
             }
 
+            
             if (nodeToProcess.Text == "Root")
             {
+                var total = filtered.Sum(x => x.Key * x.Value.Count);
+                var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash)));
                 var tasks = new List<Task>();
                 foreach (var node in nodeToProcess.Nodes)
                 {
-                    tasks.Add(ProcessClickToCalculateHash((TreeNode)node));
-                    if (tasks.Count >= 4)
+                    tasks.Add(ProcessClickToCalculateHash((TreeNode)node, ct));
+                    if (ct.IsCancellationRequested)
                     {
-                        var task = await Task.WhenAny(tasks);
-                        tasks.Remove(task);
+                        break;
                     }
+
+                    if (tasks.Count > 2)
+                    {
+                        var completed = await Task.WhenAny(tasks);
+                        tasks.Remove(completed);
+                    }
+                    //var calculated = filtered.Sum(x => x.Key * x.Value.Count(y => string.IsNullOrEmpty(y.MD5Hash)));
+                    //md5ProgressBar.Value = (int)(100 * calculated / total);
                 }
 
                 await Task.WhenAll(tasks);
+
+                cts = null; //TODO: fix: Thread unsafe
             }
         }
 
-        private async Task CalculateHashes(TreeNode nodeToCalculate)
+        private async Task CalculateHashes(TreeNode nodeToCalculate, CancellationToken ct)
         {
+            
             nodeToCalculate.BackColor = Color.Yellow;
             for (int i = 0; i < nodeToCalculate.Nodes.Count; ++i)
             {
@@ -275,6 +311,10 @@ namespace BackupSolution
                 }
 
                 treeNode.ForeColor = Color.DarkBlue;
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
             }
 
             nodeToCalculate.BackColor = Color.BlanchedAlmond;

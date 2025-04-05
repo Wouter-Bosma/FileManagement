@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -12,6 +13,8 @@ namespace BackupSolution.FolderReader
     {
         private readonly Lock _fileDataLock = new(); //Todo: ReaderWriteLockSlim?
         private string _md5Hash = string.Empty;
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+
         [JsonIgnore] public FolderData? FolderData { get; set; } = null;
         [JsonIgnore] public string FullPath => Path.Combine(FolderData == null ? string.Empty : FolderData.FolderName, FileName);
         [JsonIgnore] public string FullPathWithMd5 => $"{FullPath} - {MD5Hash}";
@@ -55,6 +58,7 @@ namespace BackupSolution.FolderReader
 
         public async ValueTask<bool> CalculateMd5Hash(bool force = false)
         {
+            _logger.Log(LogLevel.Info, $"Calculate hash for {FullPath} with Force=={force}");
             if (!force && !string.IsNullOrEmpty(MD5Hash))
             {
                 return false;
