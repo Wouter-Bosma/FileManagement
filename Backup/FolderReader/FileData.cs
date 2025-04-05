@@ -10,12 +10,31 @@ namespace BackupSolution.FolderReader
 {
     public class FileData
     {
+        private readonly Lock _fileDataLock = new(); //Todo: ReaderWriteLockSlim?
+        private string _md5Hash = string.Empty;
         [JsonIgnore] public FolderData? FolderData { get; set; } = null;
         [JsonIgnore] public string FullPath => Path.Combine(FolderData == null ? string.Empty : FolderData.FolderName, FileName);
         [JsonIgnore] public string FullPathWithMd5 => $"{FullPath} - {MD5Hash}";
         public string FileName { get; set; }
         public long FileSize { get; set; }
-        public string MD5Hash { get; set; } = string.Empty;
+
+        public string MD5Hash
+        {
+            get
+            {
+                lock (_fileDataLock)
+                {
+                    return _md5Hash;
+                }
+            }
+            set
+            {
+                lock (_fileDataLock)
+                {
+                    _md5Hash = value;
+                }
+            }
+        }
 
         public DateTime LastWriteTime { get; set; }
         
@@ -42,7 +61,7 @@ namespace BackupSolution.FolderReader
             }
             try
             {
-                await using var stream = File.OpenRead(FullPath);
+                await using var stream = File.OpenRead(FullPath); //TODO: Is await using useful?
                 using var md5 = MD5.Create();
                 var x = await md5.ComputeHashAsync(stream);
                 MD5Hash = ToHex(x);
