@@ -20,7 +20,7 @@ namespace BackupSolution
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            dataOverviewControl1?.Closing();
+            Configuration.Instance.Save();
         }
     }
 }

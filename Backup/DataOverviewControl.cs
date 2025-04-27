@@ -19,13 +19,20 @@ namespace Backup
         private TreeNode? selectedNode = null;
         private CancellationTokenSource? cts = null;
         private Dictionary<long, List<FileData>>? filtered = null;
-        private bool _isSourceWindow = true;
+        private readonly bool _isSourceWindow = true;
+
+        /*public DataOverviewControl()
+        {
+            InitializeComponent();
+            DrawFolderList();
+            
+        }*/
 
         public DataOverviewControl(bool isSourceWindow)
         {
             InitializeComponent();
-            DrawFolderList();
             _isSourceWindow = isSourceWindow;
+            DrawFolderList();
         }
 
         public void Closing()
@@ -83,8 +90,8 @@ namespace Backup
         {
             if (e.Action == TabControlAction.Selected && e?.TabPage != null && e.TabPage.Text == "Destination")
             {
-                DrawTree(sourceTreeView, Configuration.Instance.SourceData);
-                DrawTree(targetTreeView, Configuration.Instance.TargetData);
+                DrawTree(sourceTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+                //DrawTree(targetTreeView, Configuration.Instance.TargetData);
             }
         }
 
@@ -123,13 +130,13 @@ namespace Backup
                 //Add selected node
                 if (folderListBox?.SelectedItem is string item)
                 {
-                    if (!Configuration.Instance.SourceData.TryGetFolderData(item, out _))
+                    if (!Configuration.Instance.GetFolderData(_isSourceWindow).TryGetFolderData(item, out _))
                     {
-                        Configuration.Instance.SourceData.Folders.Add(await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.SourceData, refreshData));
+                        Configuration.Instance.GetFolderData(_isSourceWindow).Folders.Add(await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.GetFolderData(_isSourceWindow), refreshData));
                     }
                     else
                     {
-                        await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.SourceData, refreshData);
+                        await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.GetFolderData(_isSourceWindow), refreshData);
                     }
                 }
                 else
@@ -137,18 +144,18 @@ namespace Backup
                     //Add only unavailable nodes.
                     foreach (var folder in Configuration.Instance.Folders(_isSourceWindow))
                     {
-                        if (!Configuration.Instance.SourceData.TryGetFolderData(folder, out _))
+                        if (!Configuration.Instance.GetFolderData(_isSourceWindow).TryGetFolderData(folder, out _))
                         {
-                            Configuration.Instance.SourceData.Folders.Add(await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.SourceData, refreshData));
+                            Configuration.Instance.GetFolderData(_isSourceWindow).Folders.Add(await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.GetFolderData(_isSourceWindow), refreshData));
                         }
                         else if (refreshData)
                         {
-                            await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.SourceData, refreshData);
+                            await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.GetFolderData(_isSourceWindow), refreshData);
                         }
                     }
                 }
                 Configuration.Instance.Save();
-                DrawTree(directoryTreeView, Configuration.Instance.SourceData);
+                DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
             }
             finally
             {
@@ -159,7 +166,7 @@ namespace Backup
 
         private void drawTreeButton_Click(object sender, EventArgs e)
         {
-            DrawTree(directoryTreeView, Configuration.Instance.SourceData);
+            DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
         }
 
         private void directoryTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -194,7 +201,7 @@ namespace Backup
         {
             duplicateTreeView.Nodes.Clear();
             var result = new Dictionary<long, List<FileData>>();
-            foreach (var fd in Configuration.Instance.SourceData.EnumerateOverAllFiles())
+            foreach (var fd in Configuration.Instance.GetFolderData(_isSourceWindow).EnumerateOverAllFiles())
             {
                 if (result.TryGetValue(fd.FileSize, out var items))
                 {

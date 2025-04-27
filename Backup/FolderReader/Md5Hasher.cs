@@ -54,7 +54,7 @@ namespace Backup.FolderReader
         public async Task CalculateHashes(CancellationToken ct)
         {
             //Method to be called from Gui, as the folderdata is not intended to be thread safe we get the data first and process later.
-            var allFiles = Configuration.Instance.SourceData.EnumerateOverAllFiles().OrderByDescending(x => x.FileSize).ToList();
+            var allFiles = Configuration.Instance.GetFolderData(true).EnumerateOverAllFiles().OrderByDescending(x => x.FileSize).ToList();
             int result = 0;
             foreach (var fd in allFiles)
             {

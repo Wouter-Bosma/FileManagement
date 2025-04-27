@@ -24,9 +24,11 @@ public class Configuration
     [JsonIgnore]
     private SelectedFoldersConfiguration _targetFolders;
 
-    [JsonIgnore] public FolderData SourceData => _sourceData;
-    [JsonIgnore] public FolderData TargetData => _targetData;
-
+    public FolderData GetFolderData(bool sourceFolders)
+    {
+        return sourceFolders ? _sourceData : _targetData;
+    }
+    
     private static string _configurationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "FileManager");
     [JsonIgnore]
     public string MainConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.Config.json");
