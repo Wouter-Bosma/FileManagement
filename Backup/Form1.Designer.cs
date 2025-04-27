@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            dataOverviewControl1 = new Backup.DataOverviewControl();
+            dataOverviewControl1 = new Backup.DataOverviewControl(true);
             SuspendLayout();
             // 
             // dataOverviewControl1

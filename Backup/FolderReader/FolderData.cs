@@ -24,7 +24,7 @@ namespace BackupSolution.FolderReader
             _memo.Clear();
         }
 
-        public FolderData GetOrCreateFolderData(string root, string path, FolderData parent)
+        public FolderData GetOrCreateFolderData(string root, string path, FolderData parent, out bool found)
         {
             var combinedPath = Path.Combine(root, path);
             lock (_lockingObject)
@@ -32,6 +32,7 @@ namespace BackupSolution.FolderReader
                 if (_folders.TryGetValue(combinedPath, out var fd))
                 {
                     _logger.Log(LogLevel.Info, $"_folders Found {combinedPath}");
+                    found = true;
                     return fd;
                 }
 
@@ -40,6 +41,7 @@ namespace BackupSolution.FolderReader
                 {
                     _parent = parent,
                 };
+                found = false;
                 return folder;
             }
         }

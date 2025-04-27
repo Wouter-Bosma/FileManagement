@@ -12,18 +12,22 @@ internal class ReadFiles
     private static Logger _logger = LogManager.GetCurrentClassLogger();
     private static Lock lockingObject = new Lock();
 
-    public static async Task<FolderData> ReadFilesRecursive(string folderName, FolderData rootFolder)
+    public static async Task<FolderData> ReadFilesRecursive(string folderName, FolderData rootFolder, bool refreshData)
     {
         _logger.Log(LogLevel.Info, $"ReadFilesRecursive {folderName} on {rootFolder.FolderName}");
-        return await ReadFilesRecursive(folderName, rootFolder, rootFolder);
+        return await ReadFilesRecursive(folderName, rootFolder, rootFolder, refreshData);
     }
 
-    public static async Task<FolderData> ReadFilesRecursive(string folderName, FolderData rootFolder, FolderData parent)
+    public static async Task<FolderData> ReadFilesRecursive(string folderName, FolderData rootFolder, FolderData parent, bool refreshData = false)
     {
         folderName = folderName.EndsWith('\\') ? folderName : folderName + "\\";
         var root = Path.GetPathRoot(folderName);
         var path = Path.GetRelativePath(root, folderName);
-        var result = rootFolder.GetOrCreateFolderData(root, path, parent);
+        var result = rootFolder.GetOrCreateFolderData(root, path, parent, out bool found);
+        if (found && !refreshData)
+        {
+            return result;
+        }
         
         IEnumerable<string> folders;
         try
@@ -37,7 +41,11 @@ internal class ReadFiles
 
         await Parallel.ForEachAsync(folders, new ParallelOptions(), async (folder, _) =>
         {
-            var item = await ReadFilesRecursive(folder, rootFolder, result);
+            if (!refreshData && result.Folders.Any(f => f.FolderName.TrimEnd(Path.DirectorySeparatorChar) == folder.TrimEnd(Path.DirectorySeparatorChar)))
+            {
+                return;
+            }
+            var item = await ReadFilesRecursive(folder, rootFolder, result, refreshData);
             lock (lockingObject)
             {
                 if (!result.Folders.Any(x => x.CompareFolderName(item)))
@@ -59,12 +67,9 @@ internal class ReadFiles
                     {
                         result.Files.Add(item);
                     }
-                    else
+                    else if (refreshData && !existingFileData.Equals(item))
                     {
-                        if (!existingFileData.Equals(item))
-                        {
-                            existingFileData.MD5Hash = string.Empty;
-                        }
+                        existingFileData.MD5Hash = string.Empty;
                     }
                 }
             }

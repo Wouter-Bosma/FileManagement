@@ -19,11 +19,13 @@ namespace Backup
         private TreeNode? selectedNode = null;
         private CancellationTokenSource? cts = null;
         private Dictionary<long, List<FileData>>? filtered = null;
+        private bool _isSourceWindow = true;
 
-        public DataOverviewControl()
+        public DataOverviewControl(bool isSourceWindow)
         {
             InitializeComponent();
             DrawFolderList();
+            _isSourceWindow = isSourceWindow;
         }
 
         public void Closing()
@@ -34,7 +36,7 @@ namespace Backup
         private void DrawFolderList()
         {
             folderListBox.Items.Clear();
-            foreach (var folder in Configuration.Instance.Folders.OrderBy(x => x))
+            foreach (var folder in Configuration.Instance.Folders(_isSourceWindow).OrderBy(x => x))
             {
                 folderListBox.Items.Add(folder);
             }
@@ -50,9 +52,9 @@ namespace Backup
             fbd.Multiselect = false;
             if (fbd.ShowDialog() == DialogResult.OK)
             {
-                if (!Configuration.Instance.Folders.Contains(fbd.SelectedPath))
+                if (!Configuration.Instance.Folders(_isSourceWindow).Contains(fbd.SelectedPath))
                 {
-                    Configuration.Instance.Folders.Add(fbd.SelectedPath);
+                    Configuration.Instance.Folders(_isSourceWindow).Add(fbd.SelectedPath);
                 }
                 DrawFolderList();
             }
@@ -65,7 +67,7 @@ namespace Backup
                 return;
             }
             //TODO: Remove data from root tree
-            Configuration.Instance.Folders.Remove(item);
+            Configuration.Instance.Folders(_isSourceWindow).Remove(item);
             DrawFolderList();
         }
 
@@ -123,25 +125,25 @@ namespace Backup
                 {
                     if (!Configuration.Instance.SourceData.TryGetFolderData(item, out _))
                     {
-                        Configuration.Instance.SourceData.Folders.Add(await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.SourceData));
+                        Configuration.Instance.SourceData.Folders.Add(await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.SourceData, refreshData));
                     }
                     else
                     {
-                        await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.SourceData);
+                        await ReadFiles.ReadFilesRecursive(item, Configuration.Instance.SourceData, refreshData);
                     }
                 }
                 else
                 {
                     //Add only unavailable nodes.
-                    foreach (var folder in Configuration.Instance.Folders)
+                    foreach (var folder in Configuration.Instance.Folders(_isSourceWindow))
                     {
                         if (!Configuration.Instance.SourceData.TryGetFolderData(folder, out _))
                         {
-                            Configuration.Instance.SourceData.Folders.Add(await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.SourceData));
+                            Configuration.Instance.SourceData.Folders.Add(await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.SourceData, refreshData));
                         }
                         else if (refreshData)
                         {
-                            await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.SourceData);
+                            await ReadFiles.ReadFilesRecursive(folder, Configuration.Instance.SourceData, refreshData);
                         }
                     }
                 }

@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.Design.Serialization;
-using Backup.Copier;
-using BackupSolution.FolderReader;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Backup;
+using Backup.Copier;
+using BackupSolution.FolderReader;
 using NLog;
 
 namespace BackupSolution;
@@ -14,9 +13,16 @@ public class Configuration
     private CopyData _copyData;
     private FolderData _targetData;
     private static Configuration _config = null;
-    public List<string> Folders => SelectedFolders.Folders;
+
+    public List<string> Folders(bool sourceFolders)
+    {
+        return sourceFolders ? _sourceFolders.Folders : _targetFolders.Folders;
+    }
+
     [JsonIgnore]
-    private SelectedFoldersConfiguration SelectedFolders;
+    private SelectedFoldersConfiguration _sourceFolders;
+    [JsonIgnore]
+    private SelectedFoldersConfiguration _targetFolders;
 
     [JsonIgnore] public FolderData SourceData => _sourceData;
     [JsonIgnore] public FolderData TargetData => _targetData;
@@ -24,6 +30,8 @@ public class Configuration
     private static string _configurationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "FileManager");
     [JsonIgnore]
     public string MainConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.Config.json");
+    [JsonIgnore]
+    public string TargetFoldersConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.TargetFoldersConfig.json");
     [JsonIgnore]
     public string SourceConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.SourceData.json");
     [JsonIgnore]
@@ -54,26 +62,32 @@ public class Configuration
     public void Save()
     {
         _logger.Log(LogLevel.Info, "Saving config");
-        File.WriteAllText(MainConfigurationFileName, JsonSerializer.Serialize(SelectedFolders));
+        File.WriteAllText(MainConfigurationFileName, JsonSerializer.Serialize(_sourceFolders));
+        File.WriteAllText(TargetFoldersConfigurationFileName, JsonSerializer.Serialize(_targetFolders));
         File.WriteAllText(SourceConfigurationFileName, JsonSerializer.Serialize(_sourceData));
         File.WriteAllText(CopyConfigurationFileName, JsonSerializer.Serialize(_copyData));
-        File.WriteAllText(CopyConfigurationFileName, JsonSerializer.Serialize(_targetData));
+        File.WriteAllText(TargetConfigurationFileName, JsonSerializer.Serialize(_targetData));
     }
 
     public void Load()
     {
         _logger.Log(LogLevel.Info, "Loading config");
-        if (File.Exists(MainConfigurationFileName))
+        SelectedFoldersConfiguration? myConfig;
+        if (File.Exists(MainConfigurationFileName) && (myConfig = JsonSerializer.Deserialize<SelectedFoldersConfiguration>(File.ReadAllText(MainConfigurationFileName))) != null)
         {
-            var myConfig = JsonSerializer.Deserialize<SelectedFoldersConfiguration>(File.ReadAllText(MainConfigurationFileName));
-            if (myConfig != null)
-            {
-                SelectedFolders = myConfig;
-            }
-            else
-            {
-                SelectedFolders = new SelectedFoldersConfiguration();
-            }
+            _sourceFolders = myConfig;
+        }
+        else
+        {
+            _sourceFolders = new SelectedFoldersConfiguration();
+        }
+        if (File.Exists(TargetFoldersConfigurationFileName) && (myConfig = JsonSerializer.Deserialize<SelectedFoldersConfiguration>(File.ReadAllText(TargetFoldersConfigurationFileName))) != null)
+        {
+            _targetFolders = myConfig;
+        }
+        else
+        {
+            _targetFolders = new SelectedFoldersConfiguration();
         }
 
         FolderData? temp = null;
