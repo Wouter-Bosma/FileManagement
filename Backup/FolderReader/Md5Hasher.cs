@@ -9,35 +9,38 @@ namespace Backup.FolderReader
 {
     internal class Md5Hasher
     {
-        private Lock myLock = new Lock();
+        private readonly Lock _myLock = new();
         private CancellationTokenSource? _tokenSource = null;
         private int _filesInScope = 0;
         private int _filesProcessed = 0;
         private int _filesNotProcessed = 0;
         private string _fileNameProcessing = string.Empty;
         private string _lastFileProcessed = string.Empty;
+        private bool _workOnSourceData = false;
+
+        public Md5Hasher(bool workOnSourceData) => _workOnSourceData = workOnSourceData;
 
         public int FilesProcessed => _filesProcessed;
         public int FilesNotProcessed => _filesNotProcessed; 
         public int FilesInScope => _filesInScope;
         public string FileProcessing 
         {
-            get { lock (myLock) return _fileNameProcessing; }
-            set { lock (myLock) _fileNameProcessing = value; }
+            get { lock (_myLock) return _fileNameProcessing; }
+            set { lock (_myLock) _fileNameProcessing = value; }
         }
 
         public string LastFileProcessed
         {
-            get { lock (myLock) return _lastFileProcessed; }
-            set { lock (myLock) _lastFileProcessed = value; }
+            get { lock (_myLock) return _lastFileProcessed; }
+            set { lock (_myLock) _lastFileProcessed = value; }
         }
 
-        public async Task Start()
+        public async Task Start(bool refreshAll)
         {
             if (_tokenSource == null)
             {
                 _tokenSource = new CancellationTokenSource();
-                await CalculateHashes(_tokenSource.Token);
+                await CalculateHashes(refreshAll, _tokenSource.Token);
                 _tokenSource = null;
             }
         }
@@ -51,16 +54,23 @@ namespace Backup.FolderReader
             _tokenSource.Cancel();
         }
 
-        public async Task CalculateHashes(CancellationToken ct)
+        public async Task CalculateHashes(bool refreshAll, CancellationToken ct)
         {
             //Method to be called from Gui, as the folderdata is not intended to be thread safe we get the data first and process later.
             var allFiles = Configuration.Instance.GetFolderData(true).EnumerateOverAllFiles().OrderByDescending(x => x.FileSize).ToList();
-            int result = 0;
-            foreach (var fd in allFiles)
+            var processed = allFiles.Where(x => !refreshAll && !string.IsNullOrEmpty(x.MD5Hash)).ToList();
+            var toProcess = allFiles.Where(x => refreshAll || string.IsNullOrEmpty(x.MD5Hash)).ToList();
+            _filesProcessed = processed.Count;
+            _filesNotProcessed = toProcess.Count;
+            _filesInScope = _filesNotProcessed + _filesProcessed;
+            foreach (var fd in toProcess)
             {
+                _fileNameProcessing = fd.FileName;
                 if (await fd.CalculateMd5Hash(ct))
                 {
                     Interlocked.Increment(ref _filesProcessed);
+                    Interlocked.Decrement(ref _filesNotProcessed);
+                    _lastFileProcessed = fd.FileName;
                 }
                 else
                 {
@@ -72,6 +82,7 @@ namespace Backup.FolderReader
                     break;
                 }
             }
+            _fileNameProcessing = string.Empty;
         }
     }
 }

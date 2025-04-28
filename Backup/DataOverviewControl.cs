@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Backup.FolderReader;
 using BackupSolution;
 using BackupSolution.FolderReader;
 using NLog.Filters;
@@ -21,6 +22,7 @@ namespace Backup
         private Dictionary<long, List<FileData>>? filtered = null;
         private readonly bool _isSourceWindow = true;
 
+        private Md5Hasher _hasher;
         /*public DataOverviewControl()
         {
             InitializeComponent();
@@ -33,6 +35,7 @@ namespace Backup
             InitializeComponent();
             _isSourceWindow = isSourceWindow;
             DrawFolderList();
+            _hasher = new Md5Hasher(isSourceWindow);
         }
 
         public void Closing()
@@ -342,6 +345,22 @@ namespace Backup
                     }
                 }
                 duplicateTreeView.Enabled = true;
+            }
+        }
+
+        private bool hashing = false;
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            if (!hashing)
+            {
+                hashing = true;
+                await _hasher.Start(false);
+                hashing = false;
+            }
+            else
+            {
+                _hasher.Stop();
             }
         }
     }
