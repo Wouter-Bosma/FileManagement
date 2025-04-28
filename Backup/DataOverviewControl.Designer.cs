@@ -44,8 +44,6 @@
             tabPage2 = new TabPage();
             md5ProgressBar = new ProgressBar();
             duplicateTreeView = new TreeView();
-            duplicateContextMenuStrip = new ContextMenuStrip(components);
-            calculateMD5ToolStripMenuItem = new ToolStripMenuItem();
             findDuplicateButton = new Button();
             tabPage3 = new TabPage();
             createFolderButton = new Button();
@@ -58,12 +56,14 @@
             textBox5 = new TextBox();
             textBox4 = new TextBox();
             button1 = new Button();
+            duplicateContextMenuStrip = new ContextMenuStrip(components);
+            calculateMD5ToolStripMenuItem = new ToolStripMenuItem();
             mainViewTabControl.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
-            duplicateContextMenuStrip.SuspendLayout();
             tabPage3.SuspendLayout();
             tabPage5.SuspendLayout();
+            duplicateContextMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // addFolderButton
@@ -79,6 +79,7 @@
             // 
             // selectedFolderTextBox
             // 
+            selectedFolderTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             selectedFolderTextBox.Location = new Point(5, 874);
             selectedFolderTextBox.Margin = new Padding(4, 5, 4, 5);
             selectedFolderTextBox.Name = "selectedFolderTextBox";
@@ -87,6 +88,7 @@
             // 
             // folderListBox
             // 
+            folderListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             folderListBox.FormattingEnabled = true;
             folderListBox.Location = new Point(5, 53);
             folderListBox.Margin = new Padding(4, 5, 4, 5);
@@ -98,6 +100,7 @@
             // 
             // mainViewTabControl
             // 
+            mainViewTabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             mainViewTabControl.Controls.Add(tabPage1);
             mainViewTabControl.Controls.Add(tabPage2);
             mainViewTabControl.Controls.Add(tabPage3);
@@ -142,10 +145,11 @@
             // 
             // directoryTreeView
             // 
+            directoryTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             directoryTreeView.Location = new Point(9, 53);
             directoryTreeView.Margin = new Padding(4, 5, 4, 5);
             directoryTreeView.Name = "directoryTreeView";
-            directoryTreeView.Size = new Size(1234, 590);
+            directoryTreeView.Size = new Size(1234, 648);
             directoryTreeView.TabIndex = 2;
             directoryTreeView.NodeMouseClick += directoryTreeView_NodeMouseClick;
             // 
@@ -231,21 +235,6 @@
             duplicateTreeView.TabIndex = 11;
             duplicateTreeView.NodeMouseClick += duplicateTreeView_NodeMouseClick;
             duplicateTreeView.NodeMouseDoubleClick += duplicateTreeView_NodeMouseDoubleClick;
-            // 
-            // duplicateContextMenuStrip
-            // 
-            duplicateContextMenuStrip.ImageScalingSize = new Size(24, 24);
-            duplicateContextMenuStrip.Items.AddRange(new ToolStripItem[] { calculateMD5ToolStripMenuItem });
-            duplicateContextMenuStrip.Name = "duplicateContextMenuStrip";
-            duplicateContextMenuStrip.Size = new Size(244, 36);
-            duplicateContextMenuStrip.Click += duplicateContextMenuStrip_Click;
-            // 
-            // calculateMD5ToolStripMenuItem
-            // 
-            calculateMD5ToolStripMenuItem.Name = "calculateMD5ToolStripMenuItem";
-            calculateMD5ToolStripMenuItem.Size = new Size(243, 32);
-            calculateMD5ToolStripMenuItem.Text = "Calculate MD5 Hash";
-            calculateMD5ToolStripMenuItem.Click += calculateMD5ToolStripMenuItem_Click;
             // 
             // findDuplicateButton
             // 
@@ -364,6 +353,21 @@
             button1.Text = "button1";
             button1.UseVisualStyleBackColor = true;
             // 
+            // duplicateContextMenuStrip
+            // 
+            duplicateContextMenuStrip.ImageScalingSize = new Size(24, 24);
+            duplicateContextMenuStrip.Items.AddRange(new ToolStripItem[] { calculateMD5ToolStripMenuItem });
+            duplicateContextMenuStrip.Name = "duplicateContextMenuStrip";
+            duplicateContextMenuStrip.Size = new Size(244, 36);
+            duplicateContextMenuStrip.Click += duplicateContextMenuStrip_Click;
+            // 
+            // calculateMD5ToolStripMenuItem
+            // 
+            calculateMD5ToolStripMenuItem.Name = "calculateMD5ToolStripMenuItem";
+            calculateMD5ToolStripMenuItem.Size = new Size(243, 32);
+            calculateMD5ToolStripMenuItem.Text = "Calculate MD5 Hash";
+            calculateMD5ToolStripMenuItem.Click += calculateMD5ToolStripMenuItem_Click;
+            // 
             // DataOverviewControl
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -379,10 +383,10 @@
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
-            duplicateContextMenuStrip.ResumeLayout(false);
             tabPage3.ResumeLayout(false);
             tabPage5.ResumeLayout(false);
             tabPage5.PerformLayout();
+            duplicateContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
