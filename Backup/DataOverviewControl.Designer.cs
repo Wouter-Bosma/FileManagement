@@ -53,8 +53,8 @@
             sourceTreeView = new TreeView();
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
-            textBox5 = new TextBox();
-            textBox4 = new TextBox();
+            progressTextBox = new TextBox();
+            fileProcessedTextBox = new TextBox();
             button1 = new Button();
             duplicateContextMenuStrip = new ContextMenuStrip(components);
             calculateMD5ToolStripMenuItem = new ToolStripMenuItem();
@@ -320,8 +320,8 @@
             // 
             // tabPage5
             // 
-            tabPage5.Controls.Add(textBox5);
-            tabPage5.Controls.Add(textBox4);
+            tabPage5.Controls.Add(progressTextBox);
+            tabPage5.Controls.Add(fileProcessedTextBox);
             tabPage5.Controls.Add(button1);
             tabPage5.Location = new Point(4, 34);
             tabPage5.Name = "tabPage5";
@@ -330,28 +330,30 @@
             tabPage5.Text = "Calculate Hashes";
             tabPage5.UseVisualStyleBackColor = true;
             // 
-            // textBox5
+            // progressTextBox
             // 
-            textBox5.Location = new Point(3, 80);
-            textBox5.Name = "textBox5";
-            textBox5.Size = new Size(150, 31);
-            textBox5.TabIndex = 2;
+            progressTextBox.Location = new Point(3, 80);
+            progressTextBox.Name = "progressTextBox";
+            progressTextBox.Size = new Size(1231, 31);
+            progressTextBox.TabIndex = 2;
             // 
-            // textBox4
+            // fileProcessedTextBox
             // 
-            textBox4.Location = new Point(3, 43);
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(150, 31);
-            textBox4.TabIndex = 1;
+            fileProcessedTextBox.Location = new Point(3, 43);
+            fileProcessedTextBox.Name = "fileProcessedTextBox";
+            fileProcessedTextBox.Size = new Size(1231, 31);
+            fileProcessedTextBox.TabIndex = 1;
             // 
             // button1
             // 
+            button1.BackColor = Color.GreenYellow;
             button1.Location = new Point(3, 3);
             button1.Name = "button1";
-            button1.Size = new Size(112, 34);
+            button1.Size = new Size(150, 34);
             button1.TabIndex = 0;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
+            button1.Text = "Start Hashing";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
             // 
             // duplicateContextMenuStrip
             // 
@@ -417,8 +419,8 @@
         private TreeView sourceTreeView;
         private TabPage tabPage4;
         private TabPage tabPage5;
-        private TextBox textBox5;
-        private TextBox textBox4;
+        private TextBox progressTextBox;
+        private TextBox fileProcessedTextBox;
         private Button button1;
         private ContextMenuStrip duplicateContextMenuStrip;
         private ToolStripMenuItem calculateMD5ToolStripMenuItem;
