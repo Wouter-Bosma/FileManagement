@@ -238,9 +238,9 @@ namespace BackupSolution.FolderReader
 
             foreach (var data in Folders)
             {
-                if (folderName.StartsWith(data.FolderName))
+                if (folderName.TrimEnd(Path.DirectorySeparatorChar).StartsWith(data.FolderName.TrimEnd(Path.DirectorySeparatorChar)))
                 {
-                    var returnValue = data.FindFolder(folderName);
+                    var returnValue = data;
                     lastFoundFolder = returnValue;
                     lastLookedFolder = folderName;
                     return returnValue;
@@ -248,6 +248,19 @@ namespace BackupSolution.FolderReader
             }
 
             return null;
+        }
+
+        public bool RemoveFolder(FolderData fd)
+        {
+            Reset();
+            bool result = false;
+            var keyToRemove = _folders.FirstOrDefault(x => x.Value == fd).Key;
+            if (!string.IsNullOrEmpty(keyToRemove))
+            {
+                result = _folders.Remove(keyToRemove);
+            }
+            result = Folders.Remove(fd) && result;
+            return result;
         }
     }
 }

@@ -76,9 +76,22 @@ namespace Backup
             {
                 return;
             }
-            //TODO: Remove data from root tree
-            Configuration.Instance.Folders(_isSourceWindow).Remove(item);
-            DrawFolderList();
+
+            if (Configuration.Instance.Folders(_isSourceWindow).Remove(item))
+            {
+                DrawFolderList();
+            }
+
+            var itemToRemove = Configuration.Instance.GetFolderData(_isSourceWindow).FindFolder(item);
+            if (itemToRemove != null)
+            {
+                bool removed = Configuration.Instance.GetFolderData(_isSourceWindow).RemoveFolder(itemToRemove);
+                if (removed)
+                {
+                    Configuration.Instance.GetFolderData(_isSourceWindow).Init();
+                    DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+                }
+            }
         }
 
         private void folderListBox_SelectedValueChanged(object sender, EventArgs e)
