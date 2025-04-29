@@ -350,16 +350,40 @@ namespace Backup
 
         private bool hashing = false;
 
+        private void SetProgress(string text, int processed, int total, double hashedSize, double totalSize)
+        {
+            if (button1.InvokeRequired)
+            {
+                button1.Invoke(() => SetProgress(text, processed, total, hashedSize, totalSize));
+            }
+            else
+            {
+                fileProcessedTextBox.Text = text;
+                if (totalSize != 0 && total != 0)
+                {
+                    progressTextBox.Text = $"[{processed}/{total} = {(100.0 * processed / total):N2}%] - [{hashedSize:N0}/{totalSize:N0} = {(100.0 * hashedSize / totalSize):N0}%]";
+                }
+                else
+                {
+                    progressTextBox.Text = "totalsize of files to hash or total number of files shouldn't be 0.";
+                }
+            }
+        }
+
         private async void button1_Click(object sender, EventArgs e)
         {
             if (!hashing)
             {
                 hashing = true;
-                await _hasher.Start(false);
+                button1.BackColor = Color.Tomato;
+                await _hasher.Start(false, SetProgress);
+                button1.BackColor = Color.YellowGreen;
+                progressTextBox.Text = "Finished";
                 hashing = false;
             }
             else
             {
+                button1.BackColor = Color.YellowGreen;
                 _hasher.Stop();
             }
         }
