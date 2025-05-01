@@ -1,9 +1,5 @@
 ﻿using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace BackupSolution.FolderReader;
 
@@ -24,6 +20,7 @@ internal class ReadFiles
         var root = Path.GetPathRoot(folderName);
         var path = Path.GetRelativePath(root, folderName);
         var result = rootFolder.GetOrCreateFolderData(root, path, parent, out bool found);
+        _logger.Log(LogLevel.Info, $"Initial folder data found = {root}-{path}-{parent}-{result.Folders.Count}");
         if (found && !refreshData)
         {
             return result;
@@ -39,8 +36,16 @@ internal class ReadFiles
             folders = new List<string>();
         }
 
+        Dictionary<string, FolderData> existingFolders;
+        lock (lockingObject)
+        {
+            existingFolders = result.Folders.ToDictionary(x => x.FolderName.TrimEnd(Path.DirectorySeparatorChar), x => x);
+        }
+
+        var mySetOfFolders = new ConcurrentDictionary<string, byte>();
         await Parallel.ForEachAsync(folders, new ParallelOptions(), async (folder, _) =>
         {
+            mySetOfFolders.TryAdd(folder.TrimEnd(Path.DirectorySeparatorChar), 0);
             if (!refreshData && result.Folders.Any(f => f.FolderName.TrimEnd(Path.DirectorySeparatorChar) == folder.TrimEnd(Path.DirectorySeparatorChar)))
             {
                 return;
@@ -54,12 +59,30 @@ internal class ReadFiles
                 }
             }
         });
+        bool reset = false;
+
+        foreach (var folder in existingFolders.Where(x => mySetOfFolders.ContainsKey(x.Key)))
+        {
+            lock (lockingObject)
+            {
+                reset = result.RemoveFolder(folder.Value) || reset;
+            }
+        }
 
         try
         {
+            Dictionary<string, FileData> preExistingFiles;
+            lock (lockingObject)
+            {
+                preExistingFiles = result.Files.ToDictionary(x => x.FileName, x=> x);
+            }
+            _logger.Log(LogLevel.Info, $"Before parsing files in folder = {root}-{path}-{parent}-{result.Folders.Count}");
+
+            var filesFound = new HashSet<string>();
             foreach (var file in Directory.EnumerateFiles(folderName))
             {
                 var item = ReadFile(file);
+                filesFound.Add(item.FileName);
                 lock (lockingObject)
                 {
                     var existingFileData = result.Files.FirstOrDefault(x => x.FileName.Equals(item.FileName, StringComparison.CurrentCultureIgnoreCase));
@@ -71,6 +94,22 @@ internal class ReadFiles
                     {
                         existingFileData.MD5Hash = string.Empty;
                     }
+                }
+            }
+
+            foreach (var file in preExistingFiles.Where(file => !filesFound.Contains(file.Key)))
+            {
+                lock (lockingObject)
+                {
+                    reset = result.Files.Remove(file.Value) || reset;
+                }
+            }
+
+            if (reset)
+            {
+                lock (lockingObject)
+                {
+                    result.Reset();
                 }
             }
         }

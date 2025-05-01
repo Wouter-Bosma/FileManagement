@@ -196,7 +196,7 @@ namespace Backup
             {
                 textBox1.Text = fdCurrent.FolderName;
                 textBox2.Text = $"Folders: {fdCurrent.ChildFolders:N0} - Files: {fdCurrent.ChildFiles:N0}";
-                textBox3.Text = $"Size: {(fdCurrent.ChildFileSize / 1024 / 1024 / 1024):N0} GB / {fdCurrent.ChildFileSize:N0} BYTE";
+                textBox3.Text = $"Size: {(fdCurrent.ChildFileSize / 1024 / 1024 / 1024):N0} GB / {fdCurrent.ChildFileSize:N0} B";
                 return;
             }
 
@@ -209,7 +209,7 @@ namespace Backup
                 textBox1.Text = fdParent.FolderName;
                 textBox2.Text = x.Text;
                 var item = fdParent.Files.First(y => y.FileName == x.Text);
-                textBox3.Text = $"{item.FileSize:N0} - {item.LastWriteTime:yyyy.MM.dd - HH:mm:ss}";
+                textBox3.Text = $"{item.FileSize:N0} B - {item.LastWriteTime:yyyy.MM.dd - HH:mm:ss} - Hash: {item.MD5Hash}";
             }
         }
 
