@@ -175,6 +175,7 @@ namespace Backup
             }
             finally
             {
+                Configuration.Instance.GetFolderData(_isSourceWindow).Init();
                 ReadFolderContents.Enabled = true;
                 refreshDataCheckBox.Enabled = true;
             }

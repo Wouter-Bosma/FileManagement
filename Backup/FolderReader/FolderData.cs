@@ -1,5 +1,4 @@
 ﻿using NLog;
-using System.IO;
 using System.Text.Json.Serialization;
 
 namespace BackupSolution.FolderReader
@@ -17,11 +16,17 @@ namespace BackupSolution.FolderReader
         private static Logger _logger = LogManager.GetCurrentClassLogger();
         private Dictionary<string, FolderData> _folders;
         private Dictionary<FolderData, MemoData> _memo;
+        private Dictionary<string, FileData> _files = new();
         private FolderData _parent = null;
-        private static readonly Lock _lockingObject = new();
+        private static readonly Lock _lockingObject = new(); //Problem with two different instantiations of FolderData trees. Too frequent a lock is held
         public void Reset()
         {
             _memo.Clear();
+        }
+
+        public bool TryGetFileData(string fileName, out FileData fileData)
+        {
+            return _files.TryGetValue(fileName, out fileData);
         }
 
         public FolderData GetOrCreateFolderData(string root, string path, FolderData parent, out bool found)
@@ -81,6 +86,11 @@ namespace BackupSolution.FolderReader
             _logger.Log(LogLevel.Info, $"Init base[{Root},{RelativePath}]");
             _folders.Add(Path.Combine(Root, RelativePath), this);
             RecursiveInit();
+            _files.Clear();
+            foreach (var file in EnumerateOverAllFiles())
+            {
+                _files[file.FullPath] = file;
+            }
         }
 
         private void Init(FolderData parent, Dictionary<string, FolderData> folders, Dictionary<FolderData, MemoData> memo)

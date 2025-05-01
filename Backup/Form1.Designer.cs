@@ -33,6 +33,7 @@
             dataOverviewControl1 = new Backup.DataOverviewControl(true);
             targetTabPage = new TabPage();
             dataOverviewControl2 = new Backup.DataOverviewControl(false);
+            copyConfigTabPage = new TabPage();
             tabControl1.SuspendLayout();
             sourceTabPage.SuspendLayout();
             targetTabPage.SuspendLayout();
@@ -43,6 +44,7 @@
             tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl1.Controls.Add(sourceTabPage);
             tabControl1.Controls.Add(targetTabPage);
+            tabControl1.Controls.Add(copyConfigTabPage);
             tabControl1.Location = new Point(12, 12);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -86,6 +88,15 @@
             dataOverviewControl2.Size = new Size(1870, 824);
             dataOverviewControl2.TabIndex = 0;
             // 
+            // copyConfigTabPage
+            // 
+            copyConfigTabPage.Location = new Point(4, 34);
+            copyConfigTabPage.Name = "copyConfigTabPage";
+            copyConfigTabPage.Size = new Size(1872, 830);
+            copyConfigTabPage.TabIndex = 2;
+            copyConfigTabPage.Text = "Copy Configuration";
+            copyConfigTabPage.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -109,5 +120,6 @@
         private TabPage targetTabPage;
         private Backup.DataOverviewControl dataOverviewControl1;
         private Backup.DataOverviewControl dataOverviewControl2;
+        private TabPage copyConfigTabPage;
     }
 }

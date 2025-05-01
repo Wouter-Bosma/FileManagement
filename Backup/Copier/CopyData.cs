@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Backup.Copier
 {
-    public record CopyData (string SourceFolder, string DestinationFolder)
+    //To link: File
+    //To link: Folder
+
+    public record CopyData (string sourceData, string DestinationFolder, bool isFolderSource)
     { }
     public class CopyPairs
     {

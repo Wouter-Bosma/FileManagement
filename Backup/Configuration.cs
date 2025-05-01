@@ -31,7 +31,7 @@ public class Configuration
     
     private static string _configurationFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "FileManager");
     [JsonIgnore]
-    public string MainConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.Config.json");
+    public string MainConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.SourceFoldersConfig.json");
     [JsonIgnore]
     public string TargetFoldersConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.TargetFoldersConfig.json");
     [JsonIgnore]
