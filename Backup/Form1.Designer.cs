@@ -34,9 +34,14 @@
             targetTabPage = new TabPage();
             dataOverviewControl2 = new Backup.DataOverviewControl(false);
             copyConfigTabPage = new TabPage();
+            targetTextBox = new TextBox();
+            sourceTextBox = new TextBox();
+            targetTreeView = new TreeView();
+            sourceTreeView = new TreeView();
             tabControl1.SuspendLayout();
             sourceTabPage.SuspendLayout();
             targetTabPage.SuspendLayout();
+            copyConfigTabPage.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -50,6 +55,7 @@
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(1880, 868);
             tabControl1.TabIndex = 1;
+            tabControl1.Selected += tabControl1_Selected;
             // 
             // sourceTabPage
             // 
@@ -90,12 +96,46 @@
             // 
             // copyConfigTabPage
             // 
+            copyConfigTabPage.Controls.Add(targetTextBox);
+            copyConfigTabPage.Controls.Add(sourceTextBox);
+            copyConfigTabPage.Controls.Add(targetTreeView);
+            copyConfigTabPage.Controls.Add(sourceTreeView);
             copyConfigTabPage.Location = new Point(4, 34);
             copyConfigTabPage.Name = "copyConfigTabPage";
             copyConfigTabPage.Size = new Size(1872, 830);
             copyConfigTabPage.TabIndex = 2;
             copyConfigTabPage.Text = "Copy Configuration";
             copyConfigTabPage.UseVisualStyleBackColor = true;
+            // 
+            // targetTextBox
+            // 
+            targetTextBox.Location = new Point(1153, 40);
+            targetTextBox.Name = "targetTextBox";
+            targetTextBox.Size = new Size(716, 31);
+            targetTextBox.TabIndex = 3;
+            // 
+            // sourceTextBox
+            // 
+            sourceTextBox.Location = new Point(1153, 3);
+            sourceTextBox.Name = "sourceTextBox";
+            sourceTextBox.Size = new Size(716, 31);
+            sourceTextBox.TabIndex = 2;
+            // 
+            // targetTreeView
+            // 
+            targetTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            targetTreeView.Location = new Point(725, 3);
+            targetTreeView.Name = "targetTreeView";
+            targetTreeView.Size = new Size(422, 824);
+            targetTreeView.TabIndex = 1;
+            // 
+            // sourceTreeView
+            // 
+            sourceTreeView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            sourceTreeView.Location = new Point(3, 3);
+            sourceTreeView.Name = "sourceTreeView";
+            sourceTreeView.Size = new Size(422, 824);
+            sourceTreeView.TabIndex = 0;
             // 
             // Form1
             // 
@@ -110,6 +150,8 @@
             tabControl1.ResumeLayout(false);
             sourceTabPage.ResumeLayout(false);
             targetTabPage.ResumeLayout(false);
+            copyConfigTabPage.ResumeLayout(false);
+            copyConfigTabPage.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -121,5 +163,9 @@
         private Backup.DataOverviewControl dataOverviewControl1;
         private Backup.DataOverviewControl dataOverviewControl2;
         private TabPage copyConfigTabPage;
+        private TextBox targetTextBox;
+        private TextBox sourceTextBox;
+        private TreeView targetTreeView;
+        private TreeView sourceTreeView;
     }
 }

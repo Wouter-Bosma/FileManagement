@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Backup.FolderReader;
+using Backup.Tools;
 using BackupSolution;
 using BackupSolution.FolderReader;
 using NLog.Filters;
@@ -89,7 +90,7 @@ namespace Backup
                 if (removed)
                 {
                     Configuration.Instance.GetFolderData(_isSourceWindow).Init();
-                    DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+                    TreeHelper.DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
                 }
             }
         }
@@ -106,34 +107,9 @@ namespace Backup
         {
             if (e.Action == TabControlAction.Selected && e?.TabPage != null && e.TabPage.Text == "Destination")
             {
-                DrawTree(sourceTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+                TreeHelper.DrawTree(sourceTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
                 //DrawTree(targetTreeView, Configuration.Instance.TargetData);
             }
-        }
-
-        private void DrawTree(TreeView myTree, FolderData folderToDraw)
-        {
-            myTree.Nodes.Clear();
-
-            myTree.Nodes.Add(CreateTree(folderToDraw));
-
-        }
-
-        private TreeNode CreateTree(FolderData current)
-        {
-            var result = new TreeNode(current.FolderName);
-            result.Tag = current;
-            foreach (var item in current.Files)
-            {
-                result.Nodes.Add(item.FileName);
-            }
-
-            foreach (var item in current.Folders)
-            {
-                result.Nodes.Add(CreateTree(item));
-            }
-
-            return result;
         }
 
         private async void ReadFolderContents_Click(object sender, EventArgs e)
@@ -171,7 +147,7 @@ namespace Backup
                     }
                 }
                 Configuration.Instance.Save();
-                DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+                TreeHelper.DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
             }
             finally
             {
@@ -183,7 +159,7 @@ namespace Backup
 
         private void drawTreeButton_Click(object sender, EventArgs e)
         {
-            DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+            TreeHelper.DrawTree(directoryTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
         }
 
         private void directoryTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
