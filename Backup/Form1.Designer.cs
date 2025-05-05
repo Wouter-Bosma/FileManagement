@@ -34,6 +34,8 @@
             targetTabPage = new TabPage();
             dataOverviewControl2 = new Backup.DataOverviewControl(false);
             copyConfigTabPage = new TabPage();
+            copyButton = new Button();
+            selectionTextBox = new TextBox();
             createLinkButton = new Button();
             copyConfigurationListBox = new ListBox();
             targetTextBox = new TextBox();
@@ -98,6 +100,8 @@
             // 
             // copyConfigTabPage
             // 
+            copyConfigTabPage.Controls.Add(copyButton);
+            copyConfigTabPage.Controls.Add(selectionTextBox);
             copyConfigTabPage.Controls.Add(createLinkButton);
             copyConfigTabPage.Controls.Add(copyConfigurationListBox);
             copyConfigTabPage.Controls.Add(targetTextBox);
@@ -110,6 +114,23 @@
             copyConfigTabPage.TabIndex = 2;
             copyConfigTabPage.Text = "Copy Configuration";
             copyConfigTabPage.UseVisualStyleBackColor = true;
+            // 
+            // copyButton
+            // 
+            copyButton.Location = new Point(1158, 793);
+            copyButton.Name = "copyButton";
+            copyButton.Size = new Size(112, 34);
+            copyButton.TabIndex = 7;
+            copyButton.Text = "Copy items";
+            copyButton.UseVisualStyleBackColor = true;
+            copyButton.Click += copyButton_Click;
+            // 
+            // selectionTextBox
+            // 
+            selectionTextBox.Location = new Point(1158, 756);
+            selectionTextBox.Name = "selectionTextBox";
+            selectionTextBox.Size = new Size(711, 31);
+            selectionTextBox.TabIndex = 6;
             // 
             // createLinkButton
             // 
@@ -126,8 +147,9 @@
             copyConfigurationListBox.FormattingEnabled = true;
             copyConfigurationListBox.Location = new Point(1158, 121);
             copyConfigurationListBox.Name = "copyConfigurationListBox";
-            copyConfigurationListBox.Size = new Size(711, 704);
+            copyConfigurationListBox.Size = new Size(711, 629);
             copyConfigurationListBox.TabIndex = 4;
+            copyConfigurationListBox.MouseClick += copyConfigurationListBox_MouseClick;
             copyConfigurationListBox.DoubleClick += copyConfigurationListBox_DoubleClick;
             // 
             // targetTextBox
@@ -194,5 +216,7 @@
         private TreeView sourceTreeView;
         private Button createLinkButton;
         private ListBox copyConfigurationListBox;
+        private Button copyButton;
+        private TextBox selectionTextBox;
     }
 }

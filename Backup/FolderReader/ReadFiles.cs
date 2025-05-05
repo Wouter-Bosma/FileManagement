@@ -120,7 +120,7 @@ internal class ReadFiles
         return result;
     }
 
-    private static FileData ReadFileFunc(string fileName)
+    public static FileData ReadFileFunc(string fileName)
     {
         var fi = new FileInfo(fileName);
         var result = new FileData()

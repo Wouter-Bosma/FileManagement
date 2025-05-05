@@ -16,6 +16,7 @@ namespace BackupSolution
     {
         private TreeNode? _sourceTreeNode = null;
         private TreeNode? _targetTreeNode = null;
+        private CopyData? _selected = null;
         public Form1()
         {
             InitializeComponent();
@@ -78,6 +79,7 @@ namespace BackupSolution
                 if (copyItem.ReadableString == item)
                 {
                     toDelete = copyItem;
+                    break;
                 }
             }
 
@@ -86,6 +88,35 @@ namespace BackupSolution
                 Configuration.Instance.CopyPairs.Pairs.Remove(toDelete);
             }
             DrawCopyConfiguration(copyConfigurationListBox);
+        }
+
+        private void copyConfigurationListBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (copyConfigurationListBox?.SelectedItem is not string item)
+            {
+                return;
+            }
+            _selected = null;
+            foreach (var copyItem in Configuration.Instance.CopyPairs.Pairs)
+            {
+                if (copyItem.ReadableString == item)
+                {
+                    _selected = copyItem;
+                    break;
+                }
+            }
+
+            selectionTextBox.Text = _selected?.ReadableString ?? "No Selection";
+        }
+
+        private void copyButton_Click(object sender, EventArgs e)
+        {
+            if (_selected == null)
+            {
+                return;
+            }
+
+            CopyHelper.CopyFromSourceToTarget(_selected);
         }
     }
 }
