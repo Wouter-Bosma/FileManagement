@@ -10,7 +10,7 @@ public class Configuration
 {
     private static Logger _logger = LogManager.GetCurrentClassLogger();
     private FolderData _sourceData;
-    private CopyData _copyData;
+    private CopyPairs _copyPairs;
     private FolderData _targetData;
     private static Configuration _config = null;
 
@@ -24,7 +24,9 @@ public class Configuration
     [JsonIgnore]
     private SelectedFoldersConfiguration _targetFolders;
 
-    public FolderData GetFolderData(bool sourceFolders)
+    [JsonIgnore] public CopyPairs CopyPairs => _copyPairs;
+
+public FolderData GetFolderData(bool sourceFolders)
     {
         return sourceFolders ? _sourceData : _targetData;
     }
@@ -37,10 +39,9 @@ public class Configuration
     [JsonIgnore]
     public string SourceConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.SourceData.json");
     [JsonIgnore]
-    public string CopyConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.CopyData.json");
+    public string CopyConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.CopyPairs.json");
     [JsonIgnore]
     public string TargetConfigurationFileName => Path.Combine(_configurationFolder, $"{Environment.MachineName}.TargetData.json");
-
 
 
     public static Configuration Instance => _config ?? (_config = new Configuration(true));
@@ -67,7 +68,7 @@ public class Configuration
         File.WriteAllText(MainConfigurationFileName, JsonSerializer.Serialize(_sourceFolders));
         File.WriteAllText(TargetFoldersConfigurationFileName, JsonSerializer.Serialize(_targetFolders));
         File.WriteAllText(SourceConfigurationFileName, JsonSerializer.Serialize(_sourceData));
-        File.WriteAllText(CopyConfigurationFileName, JsonSerializer.Serialize(_copyData));
+        File.WriteAllText(CopyConfigurationFileName, JsonSerializer.Serialize(_copyPairs));
         File.WriteAllText(TargetConfigurationFileName, JsonSerializer.Serialize(_targetData));
     }
 
@@ -110,6 +111,16 @@ public class Configuration
         else
         {
             _targetData = new FolderData(@"\\","");
+        }
+
+        CopyPairs? tempCopyPairs = null;
+        if (File.Exists(CopyConfigurationFileName) && (tempCopyPairs = JsonSerializer.Deserialize<CopyPairs>(File.ReadAllText(CopyConfigurationFileName))) != null)
+        {
+            _copyPairs = tempCopyPairs;
+        }
+        else
+        {
+            _copyPairs = new CopyPairs();
         }
         _logger.Log(LogLevel.Info, "Loading config finished");
     }

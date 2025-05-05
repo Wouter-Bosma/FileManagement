@@ -45,13 +45,6 @@
             md5ProgressBar = new ProgressBar();
             duplicateTreeView = new TreeView();
             findDuplicateButton = new Button();
-            tabPage3 = new TabPage();
-            createFolderButton = new Button();
-            fileLinkButton = new Button();
-            folderLinkButton = new Button();
-            targetTreeView = new TreeView();
-            sourceTreeView = new TreeView();
-            tabPage4 = new TabPage();
             tabPage5 = new TabPage();
             progressTextBox = new TextBox();
             fileProcessedTextBox = new TextBox();
@@ -61,7 +54,6 @@
             mainViewTabControl.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
-            tabPage3.SuspendLayout();
             tabPage5.SuspendLayout();
             duplicateContextMenuStrip.SuspendLayout();
             SuspendLayout();
@@ -103,8 +95,6 @@
             mainViewTabControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             mainViewTabControl.Controls.Add(tabPage1);
             mainViewTabControl.Controls.Add(tabPage2);
-            mainViewTabControl.Controls.Add(tabPage3);
-            mainViewTabControl.Controls.Add(tabPage4);
             mainViewTabControl.Controls.Add(tabPage5);
             mainViewTabControl.Location = new Point(236, 6);
             mainViewTabControl.Margin = new Padding(4, 5, 4, 5);
@@ -247,77 +237,6 @@
             findDuplicateButton.UseVisualStyleBackColor = true;
             findDuplicateButton.Click += findDuplicateButton_Click;
             // 
-            // tabPage3
-            // 
-            tabPage3.Controls.Add(createFolderButton);
-            tabPage3.Controls.Add(fileLinkButton);
-            tabPage3.Controls.Add(folderLinkButton);
-            tabPage3.Controls.Add(targetTreeView);
-            tabPage3.Controls.Add(sourceTreeView);
-            tabPage3.Location = new Point(4, 34);
-            tabPage3.Margin = new Padding(4, 5, 4, 5);
-            tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(1257, 868);
-            tabPage3.TabIndex = 2;
-            tabPage3.Text = "Destination";
-            tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // createFolderButton
-            // 
-            createFolderButton.Location = new Point(246, 102);
-            createFolderButton.Margin = new Padding(4, 5, 4, 5);
-            createFolderButton.Name = "createFolderButton";
-            createFolderButton.Size = new Size(286, 38);
-            createFolderButton.TabIndex = 4;
-            createFolderButton.Text = " Create Folder >>";
-            createFolderButton.UseVisualStyleBackColor = true;
-            // 
-            // fileLinkButton
-            // 
-            fileLinkButton.Location = new Point(246, 53);
-            fileLinkButton.Margin = new Padding(4, 5, 4, 5);
-            fileLinkButton.Name = "fileLinkButton";
-            fileLinkButton.Size = new Size(286, 38);
-            fileLinkButton.TabIndex = 3;
-            fileLinkButton.Text = ">> Link File >>";
-            fileLinkButton.UseVisualStyleBackColor = true;
-            // 
-            // folderLinkButton
-            // 
-            folderLinkButton.Location = new Point(246, 5);
-            folderLinkButton.Margin = new Padding(4, 5, 4, 5);
-            folderLinkButton.Name = "folderLinkButton";
-            folderLinkButton.Size = new Size(286, 38);
-            folderLinkButton.TabIndex = 2;
-            folderLinkButton.Text = ">> Link Folder >>";
-            folderLinkButton.UseVisualStyleBackColor = true;
-            // 
-            // targetTreeView
-            // 
-            targetTreeView.Location = new Point(540, 5);
-            targetTreeView.Margin = new Padding(4, 5, 4, 5);
-            targetTreeView.Name = "targetTreeView";
-            targetTreeView.Size = new Size(231, 811);
-            targetTreeView.TabIndex = 1;
-            // 
-            // sourceTreeView
-            // 
-            sourceTreeView.Location = new Point(4, 5);
-            sourceTreeView.Margin = new Padding(4, 5, 4, 5);
-            sourceTreeView.Name = "sourceTreeView";
-            sourceTreeView.Size = new Size(231, 811);
-            sourceTreeView.TabIndex = 0;
-            // 
-            // tabPage4
-            // 
-            tabPage4.Location = new Point(4, 34);
-            tabPage4.Margin = new Padding(4, 5, 4, 5);
-            tabPage4.Name = "tabPage4";
-            tabPage4.Size = new Size(1257, 868);
-            tabPage4.TabIndex = 3;
-            tabPage4.Text = "Copier";
-            tabPage4.UseVisualStyleBackColor = true;
-            // 
             // tabPage5
             // 
             tabPage5.Controls.Add(progressTextBox);
@@ -385,7 +304,6 @@
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
-            tabPage3.ResumeLayout(false);
             tabPage5.ResumeLayout(false);
             tabPage5.PerformLayout();
             duplicateContextMenuStrip.ResumeLayout(false);
@@ -411,13 +329,6 @@
         private ProgressBar md5ProgressBar;
         private TreeView duplicateTreeView;
         private Button findDuplicateButton;
-        private TabPage tabPage3;
-        private Button createFolderButton;
-        private Button fileLinkButton;
-        private Button folderLinkButton;
-        private TreeView targetTreeView;
-        private TreeView sourceTreeView;
-        private TabPage tabPage4;
         private TabPage tabPage5;
         private TextBox progressTextBox;
         private TextBox fileProcessedTextBox;

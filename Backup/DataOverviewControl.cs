@@ -107,7 +107,7 @@ namespace Backup
         {
             if (e.Action == TabControlAction.Selected && e?.TabPage != null && e.TabPage.Text == "Destination")
             {
-                TreeHelper.DrawTree(sourceTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
+                //TreeHelper.DrawTree(sourceTreeView, Configuration.Instance.GetFolderData(_isSourceWindow));
                 //DrawTree(targetTreeView, Configuration.Instance.TargetData);
             }
         }

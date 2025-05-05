@@ -34,6 +34,8 @@
             targetTabPage = new TabPage();
             dataOverviewControl2 = new Backup.DataOverviewControl(false);
             copyConfigTabPage = new TabPage();
+            createLinkButton = new Button();
+            copyConfigurationListBox = new ListBox();
             targetTextBox = new TextBox();
             sourceTextBox = new TextBox();
             targetTreeView = new TreeView();
@@ -96,6 +98,8 @@
             // 
             // copyConfigTabPage
             // 
+            copyConfigTabPage.Controls.Add(createLinkButton);
+            copyConfigTabPage.Controls.Add(copyConfigurationListBox);
             copyConfigTabPage.Controls.Add(targetTextBox);
             copyConfigTabPage.Controls.Add(sourceTextBox);
             copyConfigTabPage.Controls.Add(targetTreeView);
@@ -106,6 +110,25 @@
             copyConfigTabPage.TabIndex = 2;
             copyConfigTabPage.Text = "Copy Configuration";
             copyConfigTabPage.UseVisualStyleBackColor = true;
+            // 
+            // createLinkButton
+            // 
+            createLinkButton.Location = new Point(1158, 77);
+            createLinkButton.Name = "createLinkButton";
+            createLinkButton.Size = new Size(112, 34);
+            createLinkButton.TabIndex = 5;
+            createLinkButton.Text = "Create Link";
+            createLinkButton.UseVisualStyleBackColor = true;
+            createLinkButton.Click += createLinkButton_Click;
+            // 
+            // copyConfigurationListBox
+            // 
+            copyConfigurationListBox.FormattingEnabled = true;
+            copyConfigurationListBox.Location = new Point(1158, 121);
+            copyConfigurationListBox.Name = "copyConfigurationListBox";
+            copyConfigurationListBox.Size = new Size(711, 704);
+            copyConfigurationListBox.TabIndex = 4;
+            copyConfigurationListBox.DoubleClick += copyConfigurationListBox_DoubleClick;
             // 
             // targetTextBox
             // 
@@ -128,6 +151,7 @@
             targetTreeView.Name = "targetTreeView";
             targetTreeView.Size = new Size(422, 824);
             targetTreeView.TabIndex = 1;
+            targetTreeView.NodeMouseClick += targetTreeView_NodeMouseClick;
             // 
             // sourceTreeView
             // 
@@ -136,6 +160,7 @@
             sourceTreeView.Name = "sourceTreeView";
             sourceTreeView.Size = new Size(422, 824);
             sourceTreeView.TabIndex = 0;
+            sourceTreeView.NodeMouseClick += sourceTreeView_NodeMouseClick;
             // 
             // Form1
             // 
@@ -167,5 +192,7 @@
         private TextBox sourceTextBox;
         private TreeView targetTreeView;
         private TreeView sourceTreeView;
+        private Button createLinkButton;
+        private ListBox copyConfigurationListBox;
     }
 }
