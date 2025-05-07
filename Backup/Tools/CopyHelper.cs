@@ -37,11 +37,29 @@ namespace Backup.Tools
 
         private static void CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder)
         {
+            var sourceFolderFiles = sourceFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(sourceFolder.FolderName), x => x);
+            var targetFolderFiles = targetFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(targetFolder.FolderName), x => x);
+            var toCopy = new Dictionary<string, FileData>();
+            foreach (var kvp in sourceFolderFiles)
+            {
+                if (!targetFolderFiles.ContainsKey(kvp.Key))
+                {
+                    toCopy[kvp.Key] = kvp.Value;
+                }
+            }
 
+            foreach (var kvp in toCopy)
+            {
+                var targetFileName = Path.Combine(targetFolder.FolderName, kvp.Key);
+                Directory.CreateDirectory(Path.GetFullPath(targetFileName));
+                File.Copy(kvp.Value.FullPath, targetFileName);
+                //Todo: Add newly added file to the folderdata hierachy
+            }
         }
+
         private static void CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder)
         {
-            FileData fileFound = targetFolder.Files.Where(x => string.Equals(x.FileName, sourceFile.FileName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            FileData? fileFound = targetFolder.Files.FirstOrDefault(x => string.Equals(x.FileName, sourceFile.FileName, StringComparison.InvariantCultureIgnoreCase));
 
             var copyFile = false;
             

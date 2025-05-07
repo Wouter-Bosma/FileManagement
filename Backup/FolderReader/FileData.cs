@@ -21,6 +21,18 @@ namespace BackupSolution.FolderReader
         [JsonIgnore] public string FullPath => Path.Combine(FolderData == null ? string.Empty : FolderData.FolderName, FileName);
         [JsonIgnore] public string FullPathWithMd5 => $"{FullPath} - {MD5Hash}";
 
+        public string GetRelativePath(string basePath)
+        {
+            var tempBasePath = basePath.ToLower().TrimEnd(Path.DirectorySeparatorChar);
+            var fullPath = FullPath;
+            if (FullPath.ToLower().StartsWith(tempBasePath))
+            {
+                return fullPath.Substring(tempBasePath.Length + 1);
+            }
+
+            return fullPath;
+        }
+
         public string FileName
         {
             get { lock(_fileDataLock) {return _fileName;} }
