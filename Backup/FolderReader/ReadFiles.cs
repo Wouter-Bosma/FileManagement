@@ -61,7 +61,7 @@ internal class ReadFiles
         });
         bool reset = false;
 
-        foreach (var folder in existingFolders.Where(x => mySetOfFolders.ContainsKey(x.Key)))
+        foreach (var folder in existingFolders.Where(x => !mySetOfFolders.ContainsKey(x.Key)))
         {
             lock (lockingObject)
             {
