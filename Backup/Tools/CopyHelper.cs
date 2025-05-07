@@ -51,7 +51,7 @@ namespace Backup.Tools
             foreach (var kvp in toCopy)
             {
                 var targetFileName = Path.Combine(targetFolder.FolderName, kvp.Key);
-                Directory.CreateDirectory(Path.GetFullPath(targetFileName));
+                Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
                 File.Copy(kvp.Value.FullPath, targetFileName);
                 //Todo: Add newly added file to the folderdata hierachy
             }
