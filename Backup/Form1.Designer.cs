@@ -42,10 +42,17 @@
             sourceTextBox = new TextBox();
             targetTreeView = new TreeView();
             sourceTreeView = new TreeView();
+            overwriteRadioButton = new RadioButton();
+            overwriteChangedSourceRadioButton = new RadioButton();
+            overwriteChangedHashRadioButton = new RadioButton();
+            noOverwriteRadioButton = new RadioButton();
+            checkBox1 = new CheckBox();
+            groupBox1 = new GroupBox();
             tabControl1.SuspendLayout();
             sourceTabPage.SuspendLayout();
             targetTabPage.SuspendLayout();
             copyConfigTabPage.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -100,6 +107,7 @@
             // 
             // copyConfigTabPage
             // 
+            copyConfigTabPage.Controls.Add(groupBox1);
             copyConfigTabPage.Controls.Add(copyButton);
             copyConfigTabPage.Controls.Add(selectionTextBox);
             copyConfigTabPage.Controls.Add(createLinkButton);
@@ -117,7 +125,7 @@
             // 
             // copyButton
             // 
-            copyButton.Location = new Point(1158, 793);
+            copyButton.Location = new Point(1153, 686);
             copyButton.Name = "copyButton";
             copyButton.Size = new Size(112, 34);
             copyButton.TabIndex = 7;
@@ -127,7 +135,7 @@
             // 
             // selectionTextBox
             // 
-            selectionTextBox.Location = new Point(1158, 756);
+            selectionTextBox.Location = new Point(1153, 649);
             selectionTextBox.Name = "selectionTextBox";
             selectionTextBox.Size = new Size(711, 31);
             selectionTextBox.TabIndex = 6;
@@ -145,9 +153,9 @@
             // copyConfigurationListBox
             // 
             copyConfigurationListBox.FormattingEnabled = true;
-            copyConfigurationListBox.Location = new Point(1158, 121);
+            copyConfigurationListBox.Location = new Point(1153, 117);
             copyConfigurationListBox.Name = "copyConfigurationListBox";
-            copyConfigurationListBox.Size = new Size(711, 629);
+            copyConfigurationListBox.Size = new Size(711, 529);
             copyConfigurationListBox.TabIndex = 4;
             copyConfigurationListBox.MouseClick += copyConfigurationListBox_MouseClick;
             copyConfigurationListBox.DoubleClick += copyConfigurationListBox_DoubleClick;
@@ -184,6 +192,75 @@
             sourceTreeView.TabIndex = 0;
             sourceTreeView.NodeMouseClick += sourceTreeView_NodeMouseClick;
             // 
+            // overwriteRadioButton
+            // 
+            overwriteRadioButton.AutoSize = true;
+            overwriteRadioButton.Location = new Point(179, 30);
+            overwriteRadioButton.Name = "overwriteRadioButton";
+            overwriteRadioButton.Size = new Size(171, 29);
+            overwriteRadioButton.TabIndex = 8;
+            overwriteRadioButton.TabStop = true;
+            overwriteRadioButton.Text = "Overwrite all files";
+            overwriteRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // overwriteChangedSourceRadioButton
+            // 
+            overwriteChangedSourceRadioButton.AutoSize = true;
+            overwriteChangedSourceRadioButton.Location = new Point(12, 65);
+            overwriteChangedSourceRadioButton.Name = "overwriteChangedSourceRadioButton";
+            overwriteChangedSourceRadioButton.Size = new Size(338, 29);
+            overwriteChangedSourceRadioButton.TabIndex = 9;
+            overwriteChangedSourceRadioButton.TabStop = true;
+            overwriteChangedSourceRadioButton.Text = "Overwrite Changed Source Write Time";
+            overwriteChangedSourceRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // overwriteChangedHashRadioButton
+            // 
+            overwriteChangedHashRadioButton.AutoSize = true;
+            overwriteChangedHashRadioButton.Location = new Point(12, 100);
+            overwriteChangedHashRadioButton.Name = "overwriteChangedHashRadioButton";
+            overwriteChangedHashRadioButton.Size = new Size(228, 29);
+            overwriteChangedHashRadioButton.TabIndex = 10;
+            overwriteChangedHashRadioButton.TabStop = true;
+            overwriteChangedHashRadioButton.Text = "Overwrite changed hash";
+            overwriteChangedHashRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // noOverwriteRadioButton
+            // 
+            noOverwriteRadioButton.AutoSize = true;
+            noOverwriteRadioButton.Checked = true;
+            noOverwriteRadioButton.Location = new Point(12, 30);
+            noOverwriteRadioButton.Name = "noOverwriteRadioButton";
+            noOverwriteRadioButton.Size = new Size(139, 29);
+            noOverwriteRadioButton.TabIndex = 11;
+            noOverwriteRadioButton.TabStop = true;
+            noOverwriteRadioButton.Text = "No overwrite";
+            noOverwriteRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(297, 100);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(195, 29);
+            checkBox1.TabIndex = 12;
+            checkBox1.Text = "Clone hash on copy";
+            checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(overwriteChangedHashRadioButton);
+            groupBox1.Controls.Add(checkBox1);
+            groupBox1.Controls.Add(overwriteRadioButton);
+            groupBox1.Controls.Add(overwriteChangedSourceRadioButton);
+            groupBox1.Controls.Add(noOverwriteRadioButton);
+            groupBox1.Location = new Point(1366, 686);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(498, 141);
+            groupBox1.TabIndex = 13;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Copy Options";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -199,6 +276,8 @@
             targetTabPage.ResumeLayout(false);
             copyConfigTabPage.ResumeLayout(false);
             copyConfigTabPage.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -218,5 +297,11 @@
         private ListBox copyConfigurationListBox;
         private Button copyButton;
         private TextBox selectionTextBox;
+        private RadioButton overwriteChangedSourceRadioButton;
+        private RadioButton overwriteRadioButton;
+        private RadioButton overwriteChangedHashRadioButton;
+        private CheckBox checkBox1;
+        private RadioButton noOverwriteRadioButton;
+        private GroupBox groupBox1;
     }
 }
