@@ -11,7 +11,8 @@ namespace Backup.Tools
 {
     internal static class CopyHelper
     {
-        public static void CopyFromSourceToTarget(CopyData data)
+        private static Lock _synchronizationLock = new();
+        public static async Task CopyFromSourceToTarget(CopyData data)
         {
             if (data.isFolderSource)
             {
@@ -21,7 +22,7 @@ namespace Backup.Tools
                 {
                     return;
                 }
-                CopyFromSourceToTarget(sourceFolder, targetFolder);
+                await CopyFromSourceToTarget(sourceFolder, targetFolder);
             }
             else
             {
@@ -31,11 +32,11 @@ namespace Backup.Tools
                 {
                     return;
                 }
-                CopyFromSourceToTarget(sourceFile, targetFolder);
+                await CopyFromSourceToTarget(sourceFile, targetFolder);
             }
         }
 
-        private static void CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder)
+        private static async Task CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder)
         {
             var sourceFolderFiles = sourceFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(sourceFolder.FolderName), x => x);
             var targetFolderFiles = targetFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(targetFolder.FolderName), x => x);
@@ -48,18 +49,36 @@ namespace Backup.Tools
                 }
             }
 
-            foreach (var kvp in toCopy)
+            var options = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = 3
+            };
+
+            int filesCopied = 0;
+            Parallel.ForEach(toCopy, options, async void (kvp) =>
             {
                 var targetFileName = Path.Combine(targetFolder.FolderName, kvp.Key);
                 Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
-                File.Copy(kvp.Value.FullPath, targetFileName, true);
-                targetFolder.AddOrReplaceFile(kvp.Key, kvp.Value);
-                //Todo: Add newly added file to the folderdata hierachy
-            }
+                try
+                {
+                    await Task.Run(() => File.Copy(kvp.Value.FullPath, targetFileName));
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+
+                Interlocked.Increment(ref filesCopied);
+                lock (_synchronizationLock)
+                {
+                    targetFolder.AddOrReplaceFile(kvp.Key, kvp.Value);
+                }
+            });
+
             Configuration.Instance.GetFolderData(false).Init();
         }
 
-        private static void CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder)
+        private static async Task CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder)
         {
             FileData? fileFound = targetFolder.Files.FirstOrDefault(x => string.Equals(x.FileName, sourceFile.FileName, StringComparison.InvariantCultureIgnoreCase));
 
@@ -79,13 +98,17 @@ namespace Backup.Tools
                 return;
             }
             var targetFileName = Path.Combine(targetFolder.FolderName, sourceFile.FileName);
-            File.Copy(sourceFile.FullPath, targetFileName);
+            await Task.Run(() => File.Copy(sourceFile.FullPath, targetFileName, true));
             var myFile = ReadFiles.ReadFileFunc(targetFileName);
-            if (fileFound != null)
+            lock (_synchronizationLock)
             {
-                targetFolder.Files.Remove(fileFound);
+                if (fileFound != null)
+                {
+                    targetFolder.Files.Remove(fileFound);
+                }
+
+                targetFolder.Files.Add(myFile);
             }
-            targetFolder.Files.Add(myFile);
             //Select if file needs to be copied
             //Copy file
         }

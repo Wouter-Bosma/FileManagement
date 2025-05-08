@@ -46,7 +46,7 @@ namespace BackupSolution.FolderReader
                 {
                     _parent = parent,
                 };
-                _parent.Folders.Add(folder);
+                _parent?.Folders?.Add(folder);
                 found = false;
                 return folder;
             }
