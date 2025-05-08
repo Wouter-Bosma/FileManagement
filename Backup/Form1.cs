@@ -117,6 +117,13 @@ namespace BackupSolution
             }
 
             CopyHelper.CopyFromSourceToTarget(_selected);
+            //TODO: Features
+            //Clone hash
+            //Overwrite existing
+            //Only copy on existing and different hash
+            //Only copy none existing
+            //Make multithreaded
+
         }
     }
 }

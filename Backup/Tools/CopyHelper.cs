@@ -52,9 +52,11 @@ namespace Backup.Tools
             {
                 var targetFileName = Path.Combine(targetFolder.FolderName, kvp.Key);
                 Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
-                File.Copy(kvp.Value.FullPath, targetFileName);
+                File.Copy(kvp.Value.FullPath, targetFileName, true);
+                targetFolder.AddOrReplaceFile(kvp.Key, kvp.Value);
                 //Todo: Add newly added file to the folderdata hierachy
             }
+            Configuration.Instance.GetFolderData(false).Init();
         }
 
         private static void CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder)
