@@ -144,7 +144,6 @@
             overwriteChangedHashRadioButton.Name = "overwriteChangedHashRadioButton";
             overwriteChangedHashRadioButton.Size = new Size(228, 29);
             overwriteChangedHashRadioButton.TabIndex = 10;
-            overwriteChangedHashRadioButton.TabStop = true;
             overwriteChangedHashRadioButton.Text = "Overwrite changed hash";
             overwriteChangedHashRadioButton.UseVisualStyleBackColor = true;
             // 
@@ -165,13 +164,13 @@
             overwriteRadioButton.Name = "overwriteRadioButton";
             overwriteRadioButton.Size = new Size(171, 29);
             overwriteRadioButton.TabIndex = 8;
-            overwriteRadioButton.TabStop = true;
             overwriteRadioButton.Text = "Overwrite all files";
             overwriteRadioButton.UseVisualStyleBackColor = true;
             // 
             // overwriteChangedSourceRadioButton
             // 
             overwriteChangedSourceRadioButton.AutoSize = true;
+            overwriteChangedSourceRadioButton.Checked = true;
             overwriteChangedSourceRadioButton.Location = new Point(12, 65);
             overwriteChangedSourceRadioButton.Name = "overwriteChangedSourceRadioButton";
             overwriteChangedSourceRadioButton.Size = new Size(338, 29);
@@ -183,12 +182,10 @@
             // noOverwriteRadioButton
             // 
             noOverwriteRadioButton.AutoSize = true;
-            noOverwriteRadioButton.Checked = true;
             noOverwriteRadioButton.Location = new Point(12, 30);
             noOverwriteRadioButton.Name = "noOverwriteRadioButton";
             noOverwriteRadioButton.Size = new Size(139, 29);
             noOverwriteRadioButton.TabIndex = 11;
-            noOverwriteRadioButton.TabStop = true;
             noOverwriteRadioButton.Text = "No overwrite";
             noOverwriteRadioButton.UseVisualStyleBackColor = true;
             // 

@@ -29,7 +29,7 @@ namespace Backup.Tools
                 {
                     return;
                 }
-                await CopyFromSourceToTarget(sourceFolder, targetFolder);
+                await CopyFromSourceToTarget(sourceFolder, targetFolder, setting, cloneHashOnCopy);
             }
             else
             {
@@ -39,18 +39,18 @@ namespace Backup.Tools
                 {
                     return;
                 }
-                await CopyFromSourceToTarget(sourceFile, targetFolder);
+                await CopyFromSourceToTarget(sourceFile, targetFolder, setting, cloneHashOnCopy);
             }
         }
 
-        private static async Task CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder)
+        private static async Task CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy)
         {
             var sourceFolderFiles = sourceFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(sourceFolder.FolderName), x => x);
             var targetFolderFiles = targetFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(targetFolder.FolderName), x => x);
             var toCopy = new Dictionary<string, FileData>();
             foreach (var kvp in sourceFolderFiles)
             {
-                if (!targetFolderFiles.ContainsKey(kvp.Key))
+                if (!targetFolderFiles.TryGetValue(kvp.Key, out var data) || ReplaceFile(kvp.Value, data, setting))
                 {
                     toCopy[kvp.Key] = kvp.Value;
                 }
@@ -68,7 +68,7 @@ namespace Backup.Tools
                 Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
                 try
                 {
-                    await Task.Run(() => File.Copy(kvp.Value.FullPath, targetFileName));
+                    await Task.Run(() => File.Copy(kvp.Value.FullPath, targetFileName, true));
                 }
                 catch (Exception)
                 {
@@ -78,27 +78,43 @@ namespace Backup.Tools
                 Interlocked.Increment(ref filesCopied);
                 lock (_synchronizationLock)
                 {
-                    targetFolder.AddOrReplaceFile(kvp.Key, kvp.Value);
+                    targetFolder.AddOrReplaceFile(kvp.Key, kvp.Value, cloneHashOnCopy);
                 }
             });
 
             Configuration.Instance.GetFolderData(false).Init();
         }
 
-        private static async Task CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder)
+        private static bool ReplaceFile(FileData sourceFile, FileData? targetFile, CopySetting setting)
+        {
+            if (targetFile == null)
+            {
+                return true;
+            }
+            var replace = false;
+            if (setting == CopySetting.OverwriteAll || targetFile.FileSize != sourceFile.FileSize)
+            {
+                replace = true;
+            }
+            else if (setting == CopySetting.OverwriteChangedHash)
+            {
+                if (!string.IsNullOrEmpty(sourceFile.MD5Hash) && !string.IsNullOrEmpty(targetFile.MD5Hash))
+                {
+                    replace = sourceFile.MD5Hash != targetFile.MD5Hash;
+                }
+            }
+            else if (setting == CopySetting.OverwriteChangedSourceWriteTime)
+            {
+                replace = sourceFile.LastWriteTime != targetFile.LastWriteTime || sourceFile.FileSize != targetFile.FileSize;
+            }
+            return replace;
+        }
+
+        private static async Task CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy)
         {
             FileData? fileFound = targetFolder.Files.FirstOrDefault(x => string.Equals(x.FileName, sourceFile.FileName, StringComparison.InvariantCultureIgnoreCase));
 
-            var copyFile = false;
-            
-            if (fileFound == null)
-            {
-                copyFile = true;
-            }
-            else
-            {
-                copyFile = fileFound.FileSize != sourceFile.FileSize;
-            }
+            var copyFile = ReplaceFile(sourceFile, fileFound, setting);
 
             if (!copyFile)
             {
@@ -107,6 +123,11 @@ namespace Backup.Tools
             var targetFileName = Path.Combine(targetFolder.FolderName, sourceFile.FileName);
             await Task.Run(() => File.Copy(sourceFile.FullPath, targetFileName, true));
             var myFile = ReadFiles.ReadFileFunc(targetFileName);
+            if (cloneHashOnCopy)
+            {
+                myFile.MD5Hash = sourceFile.MD5Hash;
+            }
+            myFile.LastWriteTime = sourceFile.LastWriteTime;
             lock (_synchronizationLock)
             {
                 if (fileFound != null)

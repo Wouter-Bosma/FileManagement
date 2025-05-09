@@ -73,7 +73,7 @@ namespace BackupSolution.FolderReader
             _folders[combinedPath] = this;
         }
 
-        public bool AddOrReplaceFile(string fileName, FileData fileData)
+        public bool AddOrReplaceFile(string fileName, FileData fileData, bool cloneMd5)
         {
             var tokens = fileName.Split(Path.DirectorySeparatorChar);
             var firstPath = tokens[0];
@@ -86,13 +86,17 @@ namespace BackupSolution.FolderReader
                     FolderData = this,
                     LastWriteTime = fileData.LastWriteTime
                 };
+                if (cloneMd5)
+                {
+                    fd.MD5Hash = fileData.MD5Hash;
+                }
                 Files.Add(fd);
                 return true;
             }
 
             var targetFolder = Path.Combine(FolderName, firstPath) + Path.DirectorySeparatorChar;
             var myFolder = GetOrCreateFolderData(this.Root, Path.GetRelativePath(Root, targetFolder), this, out _);
-            return myFolder.AddOrReplaceFile(Path.GetRelativePath(firstPath, fileName), fileData);
+            return myFolder.AddOrReplaceFile(Path.GetRelativePath(firstPath, fileName), fileData, cloneMd5);
         }
 
         public FolderData()
