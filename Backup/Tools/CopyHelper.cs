@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Backup.Copier;
+﻿using Backup.Copier;
 using BackupSolution;
 using BackupSolution.FolderReader;
 
@@ -19,7 +14,7 @@ namespace Backup.Tools
     internal static class CopyHelper
     {
         private static readonly Lock _synchronizationLock = new();
-        public static async Task CopyFromSourceToTarget(CopyData data, CopySetting setting, bool cloneHashOnCopy)
+        public static async Task CopyFromSourceToTarget(CopyData data, CopySetting setting, bool cloneHashOnCopy, CopyInfo copyInfo)
         {
             if (data.isFolderSource)
             {
@@ -29,7 +24,7 @@ namespace Backup.Tools
                 {
                     return;
                 }
-                await CopyFromSourceToTarget(sourceFolder, targetFolder, setting, cloneHashOnCopy);
+                await CopyFromSourceToTarget(sourceFolder, targetFolder, setting, cloneHashOnCopy, copyInfo);
             }
             else
             {
@@ -39,11 +34,11 @@ namespace Backup.Tools
                 {
                     return;
                 }
-                await CopyFromSourceToTarget(sourceFile, targetFolder, setting, cloneHashOnCopy);
+                await CopyFromSourceToTarget(sourceFile, targetFolder, setting, cloneHashOnCopy, copyInfo);
             }
         }
 
-        private static async Task CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy)
+        private static async Task CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy, CopyInfo copyInfo)
         {
             var sourceFolderFiles = sourceFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(sourceFolder.FolderName), x => x);
             var targetFolderFiles = targetFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(targetFolder.FolderName), x => x);
@@ -110,7 +105,7 @@ namespace Backup.Tools
             return replace;
         }
 
-        private static async Task CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy)
+        private static async Task CopyFromSourceToTarget(FileData sourceFile, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy, CopyInfo copyInfo)
         {
             FileData? fileFound = targetFolder.Files.FirstOrDefault(x => string.Equals(x.FileName, sourceFile.FileName, StringComparison.InvariantCultureIgnoreCase));
 

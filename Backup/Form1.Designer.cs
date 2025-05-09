@@ -173,10 +173,10 @@
             overwriteChangedSourceRadioButton.Checked = true;
             overwriteChangedSourceRadioButton.Location = new Point(12, 65);
             overwriteChangedSourceRadioButton.Name = "overwriteChangedSourceRadioButton";
-            overwriteChangedSourceRadioButton.Size = new Size(338, 29);
+            overwriteChangedSourceRadioButton.Size = new Size(361, 29);
             overwriteChangedSourceRadioButton.TabIndex = 9;
             overwriteChangedSourceRadioButton.TabStop = true;
-            overwriteChangedSourceRadioButton.Text = "Overwrite Changed Source Write Time";
+            overwriteChangedSourceRadioButton.Text = "Overwrite Changed Filesize or Write Time";
             overwriteChangedSourceRadioButton.UseVisualStyleBackColor = true;
             // 
             // noOverwriteRadioButton

@@ -109,8 +109,17 @@ namespace BackupSolution
             selectionTextBox.Text = _selected?.ReadableString ?? "No Selection";
         }
 
+        private void UpdateGui(CopyInfo copyInfo)
+        {
+            while (!copyButton.Enabled)
+            {
+                Thread.Sleep(100);
+            }
+        }
+
         private async void copyButton_Click(object sender, EventArgs e)
         {
+            copyButton.Enabled = false;
             if (_selected == null)
             {
                 return;
@@ -133,15 +142,12 @@ namespace BackupSolution
             {
                 setting = CopySetting.OverwriteChangedHash;
             }
-            await CopyHelper.CopyFromSourceToTarget(_selected, setting, cloneHasOnCopyCheckBox.Checked);
 
-            //TODO: Features
-            //Clone hash
-            //Overwrite existing
-            //Only copy on existing and different hash
-            //Only copy none existing
-            //Make multithreaded
-
+            var copyInfo = new CopyInfo();
+            var updatedGui = Task.Run(() => UpdateGui(copyInfo));
+            await CopyHelper.CopyFromSourceToTarget(_selected, setting, cloneHasOnCopyCheckBox.Checked, copyInfo);
+            copyButton.Enabled = true;
+            await updatedGui;
         }
     }
 }
