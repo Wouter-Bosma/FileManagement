@@ -109,14 +109,32 @@ namespace BackupSolution
             selectionTextBox.Text = _selected?.ReadableString ?? "No Selection";
         }
 
-        private void copyButton_Click(object sender, EventArgs e)
+        private async void copyButton_Click(object sender, EventArgs e)
         {
             if (_selected == null)
             {
                 return;
             }
 
-            CopyHelper.CopyFromSourceToTarget(_selected);
+            CopySetting setting = CopySetting.NoOverwrite;
+            if (noOverwriteRadioButton.Checked)
+            {
+                setting = CopySetting.NoOverwrite;
+            }
+            else if (overwriteRadioButton.Checked)
+            {
+                setting = CopySetting.OverwriteAll;
+            }
+            else if (overwriteChangedSourceRadioButton.Checked)
+            {
+                setting = CopySetting.OverwriteChangedSourceWriteTime;
+            }
+            else if (overwriteChangedHashRadioButton.Checked)
+            {
+                setting = CopySetting.OverwriteChangedHash;
+            }
+            await CopyHelper.CopyFromSourceToTarget(_selected, setting, cloneHasOnCopyCheckBox.Checked);
+
             //TODO: Features
             //Clone hash
             //Overwrite existing

@@ -9,10 +9,17 @@ using BackupSolution.FolderReader;
 
 namespace Backup.Tools
 {
+    enum CopySetting
+    {
+        NoOverwrite,
+        OverwriteAll,
+        OverwriteChangedSourceWriteTime,
+        OverwriteChangedHash,
+    }
     internal static class CopyHelper
     {
-        private static Lock _synchronizationLock = new();
-        public static async Task CopyFromSourceToTarget(CopyData data)
+        private static readonly Lock _synchronizationLock = new();
+        public static async Task CopyFromSourceToTarget(CopyData data, CopySetting setting, bool cloneHashOnCopy)
         {
             if (data.isFolderSource)
             {
