@@ -126,6 +126,10 @@ namespace BackupSolution
                 {
                     progressLabel.Text = "In progress";
                 }
+                else
+                {
+                    progressLabel.Text = $"{copyInfo.FilesCopied}/{copyInfo.FilesToCopy}";
+                }
             }
             else
             {
@@ -135,8 +139,7 @@ namespace BackupSolution
             var copiedFiles = copyInfo.CopiedFiles;
             if (copiedFiles.Count != copiedFilesListBox.Items.Count)
             {
-                copiedFilesListBox.Items.Clear();
-                foreach (var file in copiedFiles)
+                foreach (var file in copiedFiles.TakeLast(copiedFiles.Count - copiedFilesListBox.Items.Count))
                 {
                     copiedFilesListBox.Items.Add(file);
                 }

@@ -38,6 +38,27 @@ namespace Backup.Tools
             }
         }
 
+        private static async Task ExecuteCopy(FolderData targetFolder, FileData sourceFile, string fileName, CopyInfo copyInfo, bool cloneHashOnCopy)
+        {
+            var targetFileName = Path.Combine(targetFolder.FolderName, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
+            try
+            {
+                copyInfo.FileStart(sourceFile.FullPath);
+                await Task.Run(() => File.Copy(sourceFile.FullPath, targetFileName, true));
+                copyInfo.FileFinish(sourceFile.FullPath);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            lock (_synchronizationLock)
+            {
+                targetFolder.AddOrReplaceFile(fileName, sourceFile, cloneHashOnCopy);
+            }
+        }
+
         private static async Task CopyFromSourceToTarget(FolderData sourceFolder, FolderData targetFolder, CopySetting setting, bool cloneHashOnCopy, CopyInfo copyInfo)
         {
             var sourceFolderFiles = sourceFolder.EnumerateOverAllFiles().ToDictionary(x => x.GetRelativePath(sourceFolder.FolderName), x => x);
@@ -51,34 +72,18 @@ namespace Backup.Tools
                 }
             }
             copyInfo.FilesToCopy = toCopy.Count;
-
-            var options = new ParallelOptions()
+            var copyTasks = new List<Task>();
+            foreach(var kvp in toCopy)
             {
-                MaxDegreeOfParallelism = 3
-            };
+                copyTasks.Add(ExecuteCopy(targetFolder, kvp.Value, kvp.Key, copyInfo, cloneHashOnCopy));
+                if (copyTasks.Count > 2)
+                {
+                    var task = await Task.WhenAny(copyTasks);
+                    copyTasks.Remove(task);
+                }
+            }
 
-            int filesCopied = 0;
-            Parallel.ForEach(toCopy, options, async void (kvp) =>
-            {
-                var targetFileName = Path.Combine(targetFolder.FolderName, kvp.Key);
-                Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
-                try
-                {
-                    copyInfo.FileStart(kvp.Value.FullPath);
-                    await Task.Run(() => File.Copy(kvp.Value.FullPath, targetFileName, true));
-                    copyInfo.FileFinish(kvp.Value.FullPath);
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-
-                Interlocked.Increment(ref filesCopied);
-                lock (_synchronizationLock)
-                {
-                    targetFolder.AddOrReplaceFile(kvp.Key, kvp.Value, cloneHashOnCopy);
-                }
-            });
+            await Task.WhenAll(copyTasks);
 
             Configuration.Instance.GetFolderData(false).Init();
         }

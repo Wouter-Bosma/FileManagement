@@ -79,18 +79,30 @@ namespace BackupSolution.FolderReader
             var firstPath = tokens[0];
             if (tokens.Length == 1)
             {
-                var fd = new FileData
+                var toReplace = Files.FirstOrDefault(x => x.FileName == fileData.FileName);
+                if (toReplace != null)
                 {
-                    FileSize = fileData.FileSize,
-                    FileName = fileData.FileName,
-                    FolderData = this,
-                    LastWriteTime = fileData.LastWriteTime
-                };
-                if (cloneMd5)
-                {
-                    fd.MD5Hash = fileData.MD5Hash;
+                    toReplace.FileSize = fileData.FileSize;
+                    toReplace.FileName = fileData.FileName;
+                    toReplace.LastWriteTime = fileData.LastWriteTime;
+                    toReplace.MD5Hash = cloneMd5 ? fileData.MD5Hash : string.Empty;
                 }
-                Files.Add(fd);
+                else
+                {
+                    var fd = new FileData
+                    {
+                        FileSize = fileData.FileSize,
+                        FileName = fileData.FileName,
+                        FolderData = this,
+                        LastWriteTime = fileData.LastWriteTime
+                    };
+                    if (cloneMd5)
+                    {
+                        fd.MD5Hash = fileData.MD5Hash;
+                    }
+
+                    Files.Add(fd);
+                }
                 return true;
             }
 
