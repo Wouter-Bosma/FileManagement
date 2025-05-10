@@ -50,6 +50,7 @@ namespace Backup.Tools
                     toCopy[kvp.Key] = kvp.Value;
                 }
             }
+            copyInfo.FilesToCopy = toCopy.Count;
 
             var options = new ParallelOptions()
             {
@@ -63,7 +64,9 @@ namespace Backup.Tools
                 Directory.CreateDirectory(Path.GetDirectoryName(targetFileName));
                 try
                 {
+                    copyInfo.FileStart(kvp.Value.FullPath);
                     await Task.Run(() => File.Copy(kvp.Value.FullPath, targetFileName, true));
+                    copyInfo.FileFinish(kvp.Value.FullPath);
                 }
                 catch (Exception)
                 {
@@ -115,8 +118,12 @@ namespace Backup.Tools
             {
                 return;
             }
+
+            copyInfo.FilesToCopy = 1;
+            copyInfo.FileStart(sourceFile.FullPath);
             var targetFileName = Path.Combine(targetFolder.FolderName, sourceFile.FileName);
             await Task.Run(() => File.Copy(sourceFile.FullPath, targetFileName, true));
+            copyInfo.FileFinish(sourceFile.FullPath);
             var myFile = ReadFiles.ReadFileFunc(targetFileName);
             if (cloneHashOnCopy)
             {

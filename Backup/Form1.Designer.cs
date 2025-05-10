@@ -34,6 +34,9 @@
             targetTabPage = new TabPage();
             dataOverviewControl2 = new Backup.DataOverviewControl(false);
             copyConfigTabPage = new TabPage();
+            copiedFilesListBox = new ListBox();
+            progressLabel = new Label();
+            copyProgressBar = new ProgressBar();
             groupBox1 = new GroupBox();
             overwriteChangedHashRadioButton = new RadioButton();
             cloneHasOnCopyCheckBox = new CheckBox();
@@ -48,6 +51,7 @@
             sourceTextBox = new TextBox();
             targetTreeView = new TreeView();
             sourceTreeView = new TreeView();
+            toCopyFileListBox = new ListBox();
             tabControl1.SuspendLayout();
             sourceTabPage.SuspendLayout();
             targetTabPage.SuspendLayout();
@@ -107,6 +111,10 @@
             // 
             // copyConfigTabPage
             // 
+            copyConfigTabPage.Controls.Add(toCopyFileListBox);
+            copyConfigTabPage.Controls.Add(copiedFilesListBox);
+            copyConfigTabPage.Controls.Add(progressLabel);
+            copyConfigTabPage.Controls.Add(copyProgressBar);
             copyConfigTabPage.Controls.Add(groupBox1);
             copyConfigTabPage.Controls.Add(copyButton);
             copyConfigTabPage.Controls.Add(selectionTextBox);
@@ -122,6 +130,33 @@
             copyConfigTabPage.TabIndex = 2;
             copyConfigTabPage.Text = "Copy Configuration";
             copyConfigTabPage.UseVisualStyleBackColor = true;
+            // 
+            // copiedFilesListBox
+            // 
+            copiedFilesListBox.BackColor = Color.Black;
+            copiedFilesListBox.ForeColor = Color.Lime;
+            copiedFilesListBox.FormattingEnabled = true;
+            copiedFilesListBox.Location = new Point(1153, 464);
+            copiedFilesListBox.Name = "copiedFilesListBox";
+            copiedFilesListBox.Size = new Size(705, 179);
+            copiedFilesListBox.TabIndex = 16;
+            // 
+            // progressLabel
+            // 
+            progressLabel.AutoSize = true;
+            progressLabel.BackColor = Color.Transparent;
+            progressLabel.Location = new Point(1158, 751);
+            progressLabel.Name = "progressLabel";
+            progressLabel.Size = new Size(102, 25);
+            progressLabel.TabIndex = 15;
+            progressLabel.Text = "Not started";
+            // 
+            // copyProgressBar
+            // 
+            copyProgressBar.Location = new Point(1158, 781);
+            copyProgressBar.Name = "copyProgressBar";
+            copyProgressBar.Size = new Size(202, 34);
+            copyProgressBar.TabIndex = 14;
             // 
             // groupBox1
             // 
@@ -221,7 +256,7 @@
             copyConfigurationListBox.FormattingEnabled = true;
             copyConfigurationListBox.Location = new Point(1153, 117);
             copyConfigurationListBox.Name = "copyConfigurationListBox";
-            copyConfigurationListBox.Size = new Size(711, 529);
+            copyConfigurationListBox.Size = new Size(705, 229);
             copyConfigurationListBox.TabIndex = 4;
             copyConfigurationListBox.MouseClick += copyConfigurationListBox_MouseClick;
             copyConfigurationListBox.DoubleClick += copyConfigurationListBox_DoubleClick;
@@ -257,6 +292,16 @@
             sourceTreeView.Size = new Size(422, 824);
             sourceTreeView.TabIndex = 0;
             sourceTreeView.NodeMouseClick += sourceTreeView_NodeMouseClick;
+            // 
+            // toCopyFileListBox
+            // 
+            toCopyFileListBox.BackColor = Color.Black;
+            toCopyFileListBox.ForeColor = Color.Lime;
+            toCopyFileListBox.FormattingEnabled = true;
+            toCopyFileListBox.Location = new Point(1153, 354);
+            toCopyFileListBox.Name = "toCopyFileListBox";
+            toCopyFileListBox.Size = new Size(705, 104);
+            toCopyFileListBox.TabIndex = 17;
             // 
             // Form1
             // 
@@ -300,5 +345,9 @@
         private CheckBox cloneHasOnCopyCheckBox;
         private RadioButton noOverwriteRadioButton;
         private GroupBox groupBox1;
+        private Label progressLabel;
+        private ProgressBar copyProgressBar;
+        private ListBox copiedFilesListBox;
+        private ListBox toCopyFileListBox;
     }
 }

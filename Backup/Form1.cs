@@ -109,11 +109,71 @@ namespace BackupSolution
             selectionTextBox.Text = _selected?.ReadableString ?? "No Selection";
         }
 
+        private void UpdateGuiAction(CopyInfo copyInfo, bool finished)
+        {
+            if (copyInfo.FilesToCopy == 0 || copyInfo.FilesCopied == 0)
+            {
+                copyProgressBar.Value = 0;
+            }
+            else if (copyInfo.FilesToCopy != 0)
+            {
+                copyProgressBar.Value = (copyInfo.FilesCopied * 100 / copyInfo.FilesToCopy);
+            }
+
+            if (!finished)
+            {
+                if (progressLabel.Text == "Not started")
+                {
+                    progressLabel.Text = "In progress";
+                }
+            }
+            else
+            {
+                progressLabel.Text = "Finished";
+            }
+
+            var copiedFiles = copyInfo.CopiedFiles;
+            if (copiedFiles.Count != copiedFilesListBox.Items.Count)
+            {
+                copiedFilesListBox.Items.Clear();
+                foreach (var file in copiedFiles)
+                {
+                    copiedFilesListBox.Items.Add(file);
+                }
+            }
+
+            if (copyInfo.FilesCopyingChanged)
+            {
+                var toCopyFiles = copyInfo.FilesCopying;
+                toCopyFileListBox.Items.Clear();
+                foreach (var file in toCopyFiles)
+                {
+                    toCopyFileListBox.Items.Add(file);
+                }
+            }
+        }
+
         private void UpdateGui(CopyInfo copyInfo)
         {
             while (!copyButton.Enabled)
             {
+                if (copiedFilesListBox.InvokeRequired)
+                {
+                    copiedFilesListBox.Invoke(() => UpdateGuiAction(copyInfo, false));
+                }
+                else
+                {
+                    UpdateGuiAction(copyInfo, false);
+                }
                 Thread.Sleep(100);
+            }
+            if (copiedFilesListBox.InvokeRequired)
+            {
+                copiedFilesListBox.Invoke(() => UpdateGuiAction(copyInfo, true));
+            }
+            else
+            {
+                UpdateGuiAction(copyInfo, true);
             }
         }
 
