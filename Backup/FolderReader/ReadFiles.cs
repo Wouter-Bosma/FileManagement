@@ -61,7 +61,7 @@ internal class ReadFiles
         });
         bool reset = false;
 
-        foreach (var folder in existingFolders.Where(x => mySetOfFolders.ContainsKey(x.Key)))
+        foreach (var folder in existingFolders.Where(x => !mySetOfFolders.ContainsKey(x.Key)))
         {
             lock (lockingObject)
             {
@@ -120,7 +120,7 @@ internal class ReadFiles
         return result;
     }
 
-    private static FileData ReadFileFunc(string fileName)
+    public static FileData ReadFileFunc(string fileName)
     {
         var fi = new FileInfo(fileName);
         var result = new FileData()

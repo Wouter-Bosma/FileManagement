@@ -46,6 +46,7 @@ namespace BackupSolution.FolderReader
                 {
                     _parent = parent,
                 };
+                _parent?.Folders?.Add(folder);
                 found = false;
                 return folder;
             }
@@ -70,6 +71,44 @@ namespace BackupSolution.FolderReader
             RelativePath = relativePath;
             _logger.Log(LogLevel.Info, $"Add[{root},{relativePath},{combinedPath}]");
             _folders[combinedPath] = this;
+        }
+
+        public bool AddOrReplaceFile(string fileName, FileData fileData, bool cloneMd5)
+        {
+            var tokens = fileName.Split(Path.DirectorySeparatorChar);
+            var firstPath = tokens[0];
+            if (tokens.Length == 1)
+            {
+                var toReplace = Files.FirstOrDefault(x => x.FileName == fileData.FileName);
+                if (toReplace != null)
+                {
+                    toReplace.FileSize = fileData.FileSize;
+                    toReplace.FileName = fileData.FileName;
+                    toReplace.LastWriteTime = fileData.LastWriteTime;
+                    toReplace.MD5Hash = cloneMd5 ? fileData.MD5Hash : string.Empty;
+                }
+                else
+                {
+                    var fd = new FileData
+                    {
+                        FileSize = fileData.FileSize,
+                        FileName = fileData.FileName,
+                        FolderData = this,
+                        LastWriteTime = fileData.LastWriteTime
+                    };
+                    if (cloneMd5)
+                    {
+                        fd.MD5Hash = fileData.MD5Hash;
+                    }
+
+                    Files.Add(fd);
+                }
+                return true;
+            }
+
+            var targetFolder = Path.Combine(FolderName, firstPath) + Path.DirectorySeparatorChar;
+            var myFolder = GetOrCreateFolderData(this.Root, Path.GetRelativePath(Root, targetFolder), this, out _);
+            return myFolder.AddOrReplaceFile(Path.GetRelativePath(firstPath, fileName), fileData, cloneMd5);
         }
 
         public FolderData()
@@ -123,7 +162,7 @@ namespace BackupSolution.FolderReader
         public string Root { get; set; }
         public string RelativePath { get; set; }
 
-        public List<FolderData> Folders { get; set; } = new List<FolderData>();
+        public HashSet<FolderData> Folders { get; set; } = new HashSet<FolderData>();
         public List<FileData> Files { get; set; } = new List<FileData>();
         public DateTime UpdateTime { get; set; } = DateTime.Now;
         public bool CompareFolderName(FolderData fd)

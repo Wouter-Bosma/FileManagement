@@ -34,16 +34,29 @@
             targetTabPage = new TabPage();
             dataOverviewControl2 = new Backup.DataOverviewControl(false);
             copyConfigTabPage = new TabPage();
+            copiedFilesListBox = new ListBox();
+            progressLabel = new Label();
+            copyProgressBar = new ProgressBar();
+            groupBox1 = new GroupBox();
+            overwriteChangedHashRadioButton = new RadioButton();
+            cloneHasOnCopyCheckBox = new CheckBox();
+            overwriteRadioButton = new RadioButton();
+            overwriteChangedSourceRadioButton = new RadioButton();
+            noOverwriteRadioButton = new RadioButton();
+            copyButton = new Button();
+            selectionTextBox = new TextBox();
             createLinkButton = new Button();
             copyConfigurationListBox = new ListBox();
             targetTextBox = new TextBox();
             sourceTextBox = new TextBox();
             targetTreeView = new TreeView();
             sourceTreeView = new TreeView();
+            toCopyFileListBox = new ListBox();
             tabControl1.SuspendLayout();
             sourceTabPage.SuspendLayout();
             targetTabPage.SuspendLayout();
             copyConfigTabPage.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -98,6 +111,13 @@
             // 
             // copyConfigTabPage
             // 
+            copyConfigTabPage.Controls.Add(toCopyFileListBox);
+            copyConfigTabPage.Controls.Add(copiedFilesListBox);
+            copyConfigTabPage.Controls.Add(progressLabel);
+            copyConfigTabPage.Controls.Add(copyProgressBar);
+            copyConfigTabPage.Controls.Add(groupBox1);
+            copyConfigTabPage.Controls.Add(copyButton);
+            copyConfigTabPage.Controls.Add(selectionTextBox);
             copyConfigTabPage.Controls.Add(createLinkButton);
             copyConfigTabPage.Controls.Add(copyConfigurationListBox);
             copyConfigTabPage.Controls.Add(targetTextBox);
@@ -110,6 +130,116 @@
             copyConfigTabPage.TabIndex = 2;
             copyConfigTabPage.Text = "Copy Configuration";
             copyConfigTabPage.UseVisualStyleBackColor = true;
+            // 
+            // copiedFilesListBox
+            // 
+            copiedFilesListBox.BackColor = Color.Black;
+            copiedFilesListBox.ForeColor = Color.Lime;
+            copiedFilesListBox.FormattingEnabled = true;
+            copiedFilesListBox.Location = new Point(1153, 464);
+            copiedFilesListBox.Name = "copiedFilesListBox";
+            copiedFilesListBox.Size = new Size(705, 179);
+            copiedFilesListBox.TabIndex = 16;
+            // 
+            // progressLabel
+            // 
+            progressLabel.AutoSize = true;
+            progressLabel.BackColor = Color.Transparent;
+            progressLabel.Location = new Point(1158, 751);
+            progressLabel.Name = "progressLabel";
+            progressLabel.Size = new Size(102, 25);
+            progressLabel.TabIndex = 15;
+            progressLabel.Text = "Not started";
+            // 
+            // copyProgressBar
+            // 
+            copyProgressBar.Location = new Point(1158, 781);
+            copyProgressBar.Name = "copyProgressBar";
+            copyProgressBar.Size = new Size(202, 34);
+            copyProgressBar.TabIndex = 14;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(overwriteChangedHashRadioButton);
+            groupBox1.Controls.Add(cloneHasOnCopyCheckBox);
+            groupBox1.Controls.Add(overwriteRadioButton);
+            groupBox1.Controls.Add(overwriteChangedSourceRadioButton);
+            groupBox1.Controls.Add(noOverwriteRadioButton);
+            groupBox1.Location = new Point(1366, 686);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(498, 141);
+            groupBox1.TabIndex = 13;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Copy Options";
+            // 
+            // overwriteChangedHashRadioButton
+            // 
+            overwriteChangedHashRadioButton.AutoSize = true;
+            overwriteChangedHashRadioButton.Location = new Point(12, 100);
+            overwriteChangedHashRadioButton.Name = "overwriteChangedHashRadioButton";
+            overwriteChangedHashRadioButton.Size = new Size(228, 29);
+            overwriteChangedHashRadioButton.TabIndex = 10;
+            overwriteChangedHashRadioButton.Text = "Overwrite changed hash";
+            overwriteChangedHashRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // cloneHasOnCopyCheckBox
+            // 
+            cloneHasOnCopyCheckBox.AutoSize = true;
+            cloneHasOnCopyCheckBox.Location = new Point(297, 100);
+            cloneHasOnCopyCheckBox.Name = "cloneHasOnCopyCheckBox";
+            cloneHasOnCopyCheckBox.Size = new Size(195, 29);
+            cloneHasOnCopyCheckBox.TabIndex = 12;
+            cloneHasOnCopyCheckBox.Text = "Clone hash on copy";
+            cloneHasOnCopyCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // overwriteRadioButton
+            // 
+            overwriteRadioButton.AutoSize = true;
+            overwriteRadioButton.Location = new Point(179, 30);
+            overwriteRadioButton.Name = "overwriteRadioButton";
+            overwriteRadioButton.Size = new Size(171, 29);
+            overwriteRadioButton.TabIndex = 8;
+            overwriteRadioButton.Text = "Overwrite all files";
+            overwriteRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // overwriteChangedSourceRadioButton
+            // 
+            overwriteChangedSourceRadioButton.AutoSize = true;
+            overwriteChangedSourceRadioButton.Checked = true;
+            overwriteChangedSourceRadioButton.Location = new Point(12, 65);
+            overwriteChangedSourceRadioButton.Name = "overwriteChangedSourceRadioButton";
+            overwriteChangedSourceRadioButton.Size = new Size(361, 29);
+            overwriteChangedSourceRadioButton.TabIndex = 9;
+            overwriteChangedSourceRadioButton.TabStop = true;
+            overwriteChangedSourceRadioButton.Text = "Overwrite Changed Filesize or Write Time";
+            overwriteChangedSourceRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // noOverwriteRadioButton
+            // 
+            noOverwriteRadioButton.AutoSize = true;
+            noOverwriteRadioButton.Location = new Point(12, 30);
+            noOverwriteRadioButton.Name = "noOverwriteRadioButton";
+            noOverwriteRadioButton.Size = new Size(139, 29);
+            noOverwriteRadioButton.TabIndex = 11;
+            noOverwriteRadioButton.Text = "No overwrite";
+            noOverwriteRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // copyButton
+            // 
+            copyButton.Location = new Point(1153, 686);
+            copyButton.Name = "copyButton";
+            copyButton.Size = new Size(112, 34);
+            copyButton.TabIndex = 7;
+            copyButton.Text = "Copy items";
+            copyButton.UseVisualStyleBackColor = true;
+            copyButton.Click += copyButton_Click;
+            // 
+            // selectionTextBox
+            // 
+            selectionTextBox.Location = new Point(1153, 649);
+            selectionTextBox.Name = "selectionTextBox";
+            selectionTextBox.Size = new Size(711, 31);
+            selectionTextBox.TabIndex = 6;
             // 
             // createLinkButton
             // 
@@ -124,10 +254,11 @@
             // copyConfigurationListBox
             // 
             copyConfigurationListBox.FormattingEnabled = true;
-            copyConfigurationListBox.Location = new Point(1158, 121);
+            copyConfigurationListBox.Location = new Point(1153, 117);
             copyConfigurationListBox.Name = "copyConfigurationListBox";
-            copyConfigurationListBox.Size = new Size(711, 704);
+            copyConfigurationListBox.Size = new Size(705, 229);
             copyConfigurationListBox.TabIndex = 4;
+            copyConfigurationListBox.MouseClick += copyConfigurationListBox_MouseClick;
             copyConfigurationListBox.DoubleClick += copyConfigurationListBox_DoubleClick;
             // 
             // targetTextBox
@@ -162,6 +293,16 @@
             sourceTreeView.TabIndex = 0;
             sourceTreeView.NodeMouseClick += sourceTreeView_NodeMouseClick;
             // 
+            // toCopyFileListBox
+            // 
+            toCopyFileListBox.BackColor = Color.Black;
+            toCopyFileListBox.ForeColor = Color.Lime;
+            toCopyFileListBox.FormattingEnabled = true;
+            toCopyFileListBox.Location = new Point(1153, 354);
+            toCopyFileListBox.Name = "toCopyFileListBox";
+            toCopyFileListBox.Size = new Size(705, 104);
+            toCopyFileListBox.TabIndex = 17;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -177,6 +318,8 @@
             targetTabPage.ResumeLayout(false);
             copyConfigTabPage.ResumeLayout(false);
             copyConfigTabPage.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -194,5 +337,17 @@
         private TreeView sourceTreeView;
         private Button createLinkButton;
         private ListBox copyConfigurationListBox;
+        private Button copyButton;
+        private TextBox selectionTextBox;
+        private RadioButton overwriteChangedSourceRadioButton;
+        private RadioButton overwriteRadioButton;
+        private RadioButton overwriteChangedHashRadioButton;
+        private CheckBox cloneHasOnCopyCheckBox;
+        private RadioButton noOverwriteRadioButton;
+        private GroupBox groupBox1;
+        private Label progressLabel;
+        private ProgressBar copyProgressBar;
+        private ListBox copiedFilesListBox;
+        private ListBox toCopyFileListBox;
     }
 }
