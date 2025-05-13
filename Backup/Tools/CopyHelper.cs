@@ -45,7 +45,8 @@ namespace Backup.Tools
             try
             {
                 copyInfo.FileStart(sourceFile.FullPath);
-                await Task.Run(() => File.Copy(sourceFile.FullPath, targetFileName, true));
+                //await Task.Run(() => FileHelper.Copy(sourceFile.FullPath, targetFileName, true));
+                await FileHelper.CopyAsync(sourceFile.FullPath, targetFileName, true);
                 copyInfo.FileFinish(sourceFile.FullPath);
             }
             catch (Exception)
@@ -127,7 +128,8 @@ namespace Backup.Tools
             copyInfo.FilesToCopy = 1;
             copyInfo.FileStart(sourceFile.FullPath);
             var targetFileName = Path.Combine(targetFolder.FolderName, sourceFile.FileName);
-            await Task.Run(() => File.Copy(sourceFile.FullPath, targetFileName, true));
+            //await Task.Run(() => FileHelper.Copy(sourceFile.FullPath, targetFileName, true));
+            await FileHelper.CopyAsync(sourceFile.FullPath, targetFileName, true); 
             copyInfo.FileFinish(sourceFile.FullPath);
             var myFile = ReadFiles.ReadFileFunc(targetFileName);
             if (cloneHashOnCopy)
