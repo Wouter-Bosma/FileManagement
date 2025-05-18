@@ -158,7 +158,23 @@ namespace BackupSolution.FolderReader
             get => string.IsNullOrEmpty(ManualFolderName) ? Path.Combine(Root, RelativePath) : ManualFolderName;
             set => ManualFolderName = value;
         }
-        
+
+        [JsonIgnore]
+        public string LastChildPath
+        {
+            get
+            {
+                var tokens = FolderName.Split(Path.DirectorySeparatorChar);
+                if (tokens?.Length > 0)
+                {
+                    var lastChild = tokens.Last(x => !string.IsNullOrEmpty(x));
+                    return lastChild;
+                }
+
+                return string.Empty;
+            }
+        }
+
         public string Root { get; set; }
         public string RelativePath { get; set; }
 
