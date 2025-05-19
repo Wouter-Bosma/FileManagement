@@ -19,7 +19,11 @@ namespace Backup.Tools
             if (data.isFolderSource)
             {
                 var valid = Configuration.Instance.GetFolderData(true).TryGetFolderData(data.sourceData, out var sourceFolder);
+                var targetChildPath = sourceFolder.LastChildPath;
+                valid = valid && !string.IsNullOrEmpty(targetChildPath);
                 valid = Configuration.Instance.GetFolderData(false).TryGetFolderData(data.DestinationFolder, out var targetFolder) && valid;
+                targetFolder = targetFolder.FindOrCreateChildFolder(targetChildPath);
+                
                 if (!valid)
                 {
                     return;

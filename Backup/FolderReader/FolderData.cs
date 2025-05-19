@@ -31,6 +31,7 @@ namespace BackupSolution.FolderReader
 
         public FolderData GetOrCreateFolderData(string root, string path, FolderData parent, out bool found)
         {
+            path = path.EndsWith('\\') ? path : path + "\\";
             var combinedPath = Path.Combine(root, path);
             lock (_lockingObject)
             {
@@ -46,7 +47,7 @@ namespace BackupSolution.FolderReader
                 {
                     _parent = parent,
                 };
-                _parent?.Folders?.Add(folder);
+                parent?.Folders?.Add(folder);
                 found = false;
                 return folder;
             }
@@ -173,6 +174,20 @@ namespace BackupSolution.FolderReader
 
                 return string.Empty;
             }
+        }
+
+        public FolderData FindOrCreateChildFolder(string targetFolder)
+        {
+            var child = Folders.FirstOrDefault(x => x.LastChildPath == targetFolder);
+            if (child != null)
+            {
+                return child;
+            }
+
+            var newTarget = Path.Combine(RelativePath, targetFolder);
+            var fullPath = Path.Combine(Root, newTarget);
+            Directory.CreateDirectory(fullPath);
+            return GetOrCreateFolderData(Root, newTarget, this, out _);
         }
 
         public string Root { get; set; }
